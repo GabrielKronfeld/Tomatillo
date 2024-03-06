@@ -226,11 +226,15 @@ class SettingsModifierWidgetState extends State<SettingsModifierWidget>{
   }
   Future<void> _increaseData(String dataName) async {
     final prefs = await SharedPreferences.getInstance();
+    int step=1;
     setState(() {
       //this should be completely replaced with the getInt/SetInt stuff? I think. Maybe not.
       if(MyHomePageState.mainVars[dataName] is int ){
         print(prefs.getInt(dataName));
-        int data = (prefs.getInt(dataName) ?? 0) + 5;//from shared preferences, this adds 1 to the int with key dataName.
+        if (dataName != 'Total Cycles'){
+          step=5;
+        }
+        int data = (prefs.getInt(dataName) ?? 0) + step;//from shared preferences, this adds 1 to the int with key dataName.
         print(data);
         prefs.setInt(dataName, data); //this then updates the int with key dataName with the new int. basically a 2 line ++.
         MyHomePageState.mainVars[dataName]=prefs.getInt(dataName);
@@ -239,10 +243,14 @@ class SettingsModifierWidgetState extends State<SettingsModifierWidget>{
   }
   Future<void> _decreaseData(String dataName) async {
     final prefs = await SharedPreferences.getInstance();
+    int step =1;
     setState(() {
       //so we can't go below 1 second or 1 break.
       if(MyHomePageState.mainVars[dataName] is int && MyHomePageState.mainVars[dataName]>1){
-        int data = (prefs.getInt(dataName) ?? 0) - 5;//from shared preferences, this subtracts 1 to the int with key dataName.
+        if (dataName!='Total Cycles' && MyHomePageState.mainVars[dataName]>5){
+          step=5;
+        }
+        int data = (prefs.getInt(dataName) ?? 0) - step;//from shared preferences, this subtracts 1 to the int with key dataName.
         prefs.setInt(dataName, data); //this then updates the int with key dataName with the new int. basically a 2 line --.
         MyHomePageState.mainVars[dataName]=prefs.getInt(dataName);//we still need to actually update the mainVars.
       }
