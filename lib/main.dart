@@ -84,7 +84,8 @@ static  Map mainVars = {
   'Break Time' : 5,//total time for break session
   'Total Cycles' : 3,//total work/break cycles to run
   'Overflow Time' : true,
-  'Units' : 'seconds'
+  'Units' : 'seconds',
+  
 };
 
 

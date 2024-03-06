@@ -102,19 +102,21 @@ class SettingsModifierWidgetState extends State<SettingsModifierWidget>{
   Widget buildSettingsRow(mainVarsKey){
 
     if(MyHomePageState.mainVars[mainVarsKey] is int){
-      //
+      
       return Row(
       children: <Widget> [
         const Padding(padding: EdgeInsets.fromLTRB(20, 0, 0, 0)),
         Center(child: Text(widget.valueName.toString())),
         const Expanded(child: Padding(padding: EdgeInsets.symmetric())),
-        //PLUS VAR
+
+        //MINUS VAR
         ElevatedButton(
           onPressed: () {
-            _increaseData(widget.valueName);
-          }, 
-          child: const Icon(Icons.add),
+            _decreaseData(widget.valueName);
+          },  
+          child: const Icon(Icons.remove),
         ),
+        
         //CENTERED VALUE OF VAR
         SizedBox(
           width: 40.0,
@@ -122,13 +124,15 @@ class SettingsModifierWidgetState extends State<SettingsModifierWidget>{
             child: Text(MyHomePageState.mainVars[widget.valueName].toString())
           ),
         ),
-        //MINUS VAR
+
+        //PLUS VAR
         ElevatedButton(
           onPressed: () {
-            _decreaseData(widget.valueName);
-          },  
-          child: const Icon(Icons.remove),
-        ), 
+            _increaseData(widget.valueName);
+          }, 
+          child: const Icon(Icons.add),
+        ),
+         
       const Padding(padding: EdgeInsets.fromLTRB(0, 0, 20, 0)),
       ],
       );
@@ -165,27 +169,31 @@ class SettingsModifierWidgetState extends State<SettingsModifierWidget>{
         const Padding(padding: EdgeInsets.fromLTRB(20, 0, 0, 0)),
         Center(child: Text(widget.valueName.toString())),
         const Expanded(child: Padding(padding: EdgeInsets.symmetric())),
-        //PLUS VAR
-        ElevatedButton(
-          onPressed: () {
-            _nextStringData(widget.valueName);
-          }, 
-          child: const Icon(Icons.add),
-        ),
-        //CENTERED VALUE OF VAR
-        SizedBox(
-          width: 40.0,
-          child: Center(
-            child: Text(MyHomePageState.mainVars[widget.valueName].toString())
-          ),
-        ),
+
         //MINUS VAR
         ElevatedButton(
           onPressed: () {
             _prevStringData(widget.valueName);
           },  
-          child: const Icon(Icons.remove),
-        ), 
+          child: const Icon(Icons.arrow_back),
+        ),
+        
+        //CENTERED VALUE OF VAR
+        SizedBox(
+          width: 80.0,
+          child: Center(
+            child: Text(MyHomePageState.mainVars[widget.valueName].toString())
+          ),
+        ),
+
+        //PLUS VAR
+        ElevatedButton(
+          onPressed: () {
+            _nextStringData(widget.valueName);
+          }, 
+          child: const Icon(Icons.arrow_forward),
+        ),
+         
       const Padding(padding: EdgeInsets.fromLTRB(0, 0, 20, 0)),
       ],
       );
@@ -222,7 +230,7 @@ class SettingsModifierWidgetState extends State<SettingsModifierWidget>{
       //this should be completely replaced with the getInt/SetInt stuff? I think. Maybe not.
       if(MyHomePageState.mainVars[dataName] is int ){
         print(prefs.getInt(dataName));
-        int data = (prefs.getInt(dataName) ?? 0) + 1;//from shared preferences, this adds 1 to the int with key dataName.
+        int data = (prefs.getInt(dataName) ?? 0) + 5;//from shared preferences, this adds 1 to the int with key dataName.
         print(data);
         prefs.setInt(dataName, data); //this then updates the int with key dataName with the new int. basically a 2 line ++.
         MyHomePageState.mainVars[dataName]=prefs.getInt(dataName);
@@ -234,7 +242,7 @@ class SettingsModifierWidgetState extends State<SettingsModifierWidget>{
     setState(() {
       //so we can't go below 1 second or 1 break.
       if(MyHomePageState.mainVars[dataName] is int && MyHomePageState.mainVars[dataName]>1){
-        int data = (prefs.getInt(dataName) ?? 0) - 1;//from shared preferences, this subtracts 1 to the int with key dataName.
+        int data = (prefs.getInt(dataName) ?? 0) - 5;//from shared preferences, this subtracts 1 to the int with key dataName.
         prefs.setInt(dataName, data); //this then updates the int with key dataName with the new int. basically a 2 line --.
         MyHomePageState.mainVars[dataName]=prefs.getInt(dataName);//we still need to actually update the mainVars.
       }
@@ -255,29 +263,50 @@ class SettingsModifierWidgetState extends State<SettingsModifierWidget>{
     });
   }
 
-
+  //cycles through the units to set new unit type
   Future<void> _nextStringData(String dataName) async {
     final prefs = await SharedPreferences.getInstance();
+    String data='';
+
     setState(() {
       //so we can't go below 1 second or 1 break.
-      if(MyHomePageState.mainVars[dataName] is int && MyHomePageState.mainVars[dataName]>1){
-        int data = (prefs.getInt(dataName) ?? 0) - 1;//from shared preferences, this subtracts 1 to the int with key dataName.
-        prefs.setInt(dataName, data); //this then updates the int with key dataName with the new int. basically a 2 line --.
-        MyHomePageState.mainVars[dataName]=prefs.getInt(dataName);//we still need to actually update the mainVars.
+      if(MyHomePageState.mainVars[dataName] is String){
+        List units = <String>['Seconds', '10 seconds','Minutes'];
+        print(units);
+        for (int i=0; i< units.length; i++){
+          if (units[i] == MyHomePageState.mainVars[dataName]){
+
+            data = units[(i+1)%units.length];
+          }
+        }
+        if (data==''){
+          data='Seconds';
+        }
+        prefs.setString(dataName, data); 
+        MyHomePageState.mainVars[dataName]=prefs.getString(dataName);
       }
       
     });
   }
 
-
+  //cycles through the units to set the new unit type, but in other direction. not super necessary but w/e
   Future<void> _prevStringData(String dataName) async {
     final prefs = await SharedPreferences.getInstance();
+    String data='';
     setState(() {
       //so we can't go below 1 second or 1 break.
-      if(MyHomePageState.mainVars[dataName] is int && MyHomePageState.mainVars[dataName]>1){
-        int data = (prefs.getInt(dataName) ?? 0) - 1;//from shared preferences, this subtracts 1 to the int with key dataName.
-        prefs.setInt(dataName, data); //this then updates the int with key dataName with the new int. basically a 2 line --.
-        MyHomePageState.mainVars[dataName]=prefs.getInt(dataName);//we still need to actually update the mainVars.
+      if(MyHomePageState.mainVars[dataName] is String){
+        List units = <String>['Seconds', '10 seconds','minutes'];
+        for (int i=0; i< units.length; i++){
+          if (units[i] == MyHomePageState.mainVars[dataName]){
+            data = units[(i-1)%units.length];
+          }
+        }
+        if(data==''){
+          data='Seconds';
+        }
+        prefs.setString(dataName, data); 
+        MyHomePageState.mainVars[dataName]=prefs.getString(dataName);
       }
       
     });
