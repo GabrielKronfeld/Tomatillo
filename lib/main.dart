@@ -1,4 +1,4 @@
-//TODO:
+
     //DONE First, make sure we don't already have a periodic timer running; we don't want concurrent runs 
     //DONE guarantee we have single, UNIQUE timer to be running at any given time. 
     //DONE check if there is currently a timer. if there IS, then do nothing FOR NOW. 
@@ -8,29 +8,39 @@
     //TIME TO ADD NEW UI 🤮
     //DONE we can do this by adjusting the UI to remove begin session and add 2 more buttons.
     //DONE we should do this on a separate row of buttons.
-    //add Calendar  page
+
     //DONE add Settings page
+    //DONE add overflow time option functionality
+    //DONE add background functionality
+    // bg func is done, without adding anything? leaves me confused but very pleased.
     // Brush up the logic
     //  check for extreme conditions FIRST, so check if we've forced the end FIRST, that kind of stuff.
     //Add sound 
     // DONE-ISH -chime when timers finish
     // unneeded tbh, for now. -on button press?
     //  DONE-for the most part-test sound samples 
+//TODO:
 
-    //more elegant method to keep track of time
+    //add Calendar  page
+    //make more elegant method to keep track of time
+    //above done, just set it to minute:second format. 
     //add animation for the timer
+    //fix start break early button
+    //make units value work properly.
+    //Add a dark mode!!
+    //classic pomodoro button
 
 
     //add a way to add minutes without needing to tap 60 times.
     //reformat displays to show minute:second time. 
-    //DONE add overflow time option functionality
-    //add background functionality
+
 
 import 'dart:async';
 import 'dart:io';
 import 'dart:core';
 import 'package:flutter/material.dart';
 import 'settings_page.dart';
+import 'calendar_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 //MAKE SURE ALL AUDIO IS IN FLUTTER ASSETS IN THE PUBSPEC.YAML
 import 'package:audioplayers/audioplayers.dart';
@@ -137,7 +147,7 @@ Future<void> _loadData() async {
     }
  
     //what we do on start. Just so we can add things to the start of the work session if need be.
-   _startPomodoro(){
+    _startPomodoro(){
     if (!timerExists){
 
       tempDidWeFinish='onPomodoro!';
@@ -284,6 +294,8 @@ Future<void> _loadData() async {
         )) : 
         (ElevatedButton.icon(
           onPressed: (){
+
+            print("object");
             setState(() {     
               onBreak=false;
               _startPomodoro();
@@ -367,7 +379,9 @@ Future<void> _loadData() async {
                     children: [// row of buttons for the main page
                       ElevatedButton.icon(//this brings us to the calendar page
                     onPressed: (){
-                      ;
+                      //navigate to Calendar Page
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const MyCalendarPage()));
+                      
                       },
                     icon: const Icon(Icons.calendar_month),
                     

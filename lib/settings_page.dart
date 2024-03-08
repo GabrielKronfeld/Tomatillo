@@ -279,7 +279,7 @@ class SettingsModifierWidgetState extends State<SettingsModifierWidget>{
     setState(() {
       //so we can't go below 1 second or 1 break.
       if(MyHomePageState.mainVars[dataName] is String){
-        List units = <String>['Seconds', '10 seconds','Minutes'];
+        List units = <String>['seconds', '10 seconds','minutes'];
         print(units);
         for (int i=0; i< units.length; i++){
           if (units[i] == MyHomePageState.mainVars[dataName]){
@@ -288,7 +288,7 @@ class SettingsModifierWidgetState extends State<SettingsModifierWidget>{
           }
         }
         if (data==''){
-          data='Seconds';
+          data='seconds';
         }
         prefs.setString(dataName, data); 
         MyHomePageState.mainVars[dataName]=prefs.getString(dataName);
@@ -304,14 +304,14 @@ class SettingsModifierWidgetState extends State<SettingsModifierWidget>{
     setState(() {
       //so we can't go below 1 second or 1 break.
       if(MyHomePageState.mainVars[dataName] is String){
-        List units = <String>['Seconds', '10 seconds','minutes'];
+        List units = <String>['seconds', '10 seconds','minutes'];
         for (int i=0; i< units.length; i++){
           if (units[i] == MyHomePageState.mainVars[dataName]){
             data = units[(i-1)%units.length];
           }
         }
         if(data==''){
-          data='Seconds';
+          data='seconds';
         }
         prefs.setString(dataName, data); 
         MyHomePageState.mainVars[dataName]=prefs.getString(dataName);
