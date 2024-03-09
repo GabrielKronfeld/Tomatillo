@@ -41,9 +41,11 @@ import 'dart:core';
 import 'package:flutter/material.dart';
 import 'settings_page.dart';
 import 'calendar_page.dart';
+import 'timer_indicator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 //MAKE SURE ALL AUDIO IS IN FLUTTER ASSETS IN THE PUBSPEC.YAML
 import 'package:audioplayers/audioplayers.dart';
+
 
 void main() {
   runApp(const MyApp());
@@ -121,6 +123,7 @@ Future<void> _loadData() async {
 
   //logic vars
   int mainTimerCount =0; //main timer count for pomodoro timer
+  int totalTimeForCycleinSeconds=0;
   int cyclesRemaining=0;
   int timeRemaining  =0; //overflow time when jump to pause/break time.
   bool onBreak   = false; //are we on a break or on a work session?
@@ -159,7 +162,8 @@ Future<void> _loadData() async {
     _startTimer(timeToRun, cycles){
       //once every second, decrease the time by a second (duh)
       timerExists=true;
-      mainTimerCount = timeToRun+(mainVars['Overflow Time']? timeRemaining:0);
+      mainTimerCount= timeToRun+(mainVars['Overflow Time']? timeRemaining:0);
+      totalTimeForCycleinSeconds=mainTimerCount;
       timeRemaining=0;
       Timer.periodic(const Duration(seconds: 1), (timer) { 
         print('timer count: $mainTimerCount');
@@ -364,6 +368,9 @@ Future<void> _loadData() async {
                 Text(
                   'timer: $minutes:$seconds',
                   style: Theme.of(context).textTheme.headlineLarge,
+                ),
+
+                TimerIndicator(totalTimeinSeconds: totalTimeForCycleinSeconds, minutes: minutes, seconds:seconds,
                 ),
                 Text(
                   'breaks remaining: $cyclesRemaining',
