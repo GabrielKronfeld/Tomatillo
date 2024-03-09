@@ -96,6 +96,7 @@ static  Map mainVars = {
   'Break Time' : 5,//total time for break session
   'Total Cycles' : 3,//total work/break cycles to run
   'Overflow Time' : true,
+  'Invisible Timer' : false,
   'Units' : 'seconds',
   
 };
@@ -117,6 +118,8 @@ Future<void> _loadData() async {
       prefs.getInt('Break Time') == null ? (prefs.setInt('Break Time',mainVars['Break Time'])):(mainVars['Break Time']=prefs.getInt('Break Time'));
       prefs.getInt('Total Cycles') == null ? (prefs.setInt('Total Cycles',mainVars['Total Cycles'])):(mainVars['Total Cycles']=prefs.getInt('Total Cycles'));
       prefs.getBool('Overflow Time') == null ? (prefs.setBool('Overflow Time',mainVars['Overflow Time'])):(mainVars['Overflow Time']=prefs.getBool('Overflow Time'));
+      prefs.getBool('Invisible Timer') == null ? (prefs.setBool('Invisible Timer',mainVars['Invisible Timer'])):(mainVars['Invisible Timer']=prefs.getBool('Invisible Timer'));
+      prefs.getString('Units') == null ? (prefs.setString('Units',mainVars['Units'])):(mainVars['Units']=prefs.getString('Units'));
 
     });
   }
@@ -362,21 +365,24 @@ Future<void> _loadData() async {
               
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Text(
-                  tempDidWeFinish,
-                ),
-                Text(
-                  'timer: $minutes:$seconds',
-                  style: Theme.of(context).textTheme.headlineLarge,
+
+                
+                Padding(
+                  padding: const EdgeInsets.all(50.0),
+                  child: Text(
+                    tempDidWeFinish,
+                  ),
                 ),
 
                 TimerIndicator(totalTimeinSeconds: totalTimeForCycleinSeconds, minutes: minutes, seconds:seconds,
                 ),
+                Padding(padding: EdgeInsetsDirectional.symmetric()),
+
                 Text(
                   'breaks remaining: $cyclesRemaining',
                   style: Theme.of(context).textTheme.labelSmall,
                 ),
-                const Padding(padding: EdgeInsets.fromLTRB(0,0,0,50.0)),
+                const Padding(padding: EdgeInsets.fromLTRB(0,0,0,20.0)),
 
                 beginOrAlterSession,
 
@@ -395,7 +401,8 @@ Future<void> _loadData() async {
                     //add padding here, and later remove the + button for a nav bar at the bottom
                     label: const Text("Calendar"),
                   ),
-                 
+                  const Padding(padding: EdgeInsets.all(8)),
+
                   ElevatedButton.icon(
                     onPressed: (){
                       //navigate to Setting Page

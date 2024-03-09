@@ -65,6 +65,13 @@ class MySettingsPageState extends State<MySettingsPage> {
                 child: SettingsModifierWidget(valueName: 'Overflow Time',)
 
               ),
+              const BlackBarPadding(),
+
+              SizedBox(
+                height:45.0,
+                child: SettingsModifierWidget(valueName: 'Invisible Timer',)
+
+              ),
             
             //  SettingsModifierWidget(),
             ]
