@@ -68,14 +68,14 @@ class MyApp extends StatelessWidget {
       ),
       // Your initialization for material app.
     );
-    return MaterialApp(
-      title: 'Tomatillo',
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
-      ),
-      home: const MyHomePage(title: 'Tomatillo\n🐸🍅🐸🍅🐸🍅🐸'),
-    );
+    // return MaterialApp(
+    //   title: 'Tomatillo',
+    //   theme: ThemeData(
+    //     useMaterial3: true,
+    //     colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
+    //   ),
+    //   home: const MyHomePage(title: 'Tomatillo\n🐸🍅🐸🍅🐸🍅🐸'),
+    // );
   }
 }
 

@@ -1,3 +1,5 @@
+import 'package:calendar_view/calendar_view.dart';
+
 import 'main.dart';
 import 'package:flutter/material.dart';
 import 'package:time_planner/time_planner.dart';
@@ -39,58 +41,18 @@ class MyCalendarPageState extends State<MyCalendarPage2> {
     return Scaffold(
       backgroundColor: bgColor,
       body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Padding(
-                padding: const EdgeInsets.all(20.0),
+
+              Padding(
+                padding: const EdgeInsets.all(8.0),
                 child: ElevatedButton(
-                  onPressed: (){
-                    Navigator.pop(context);
-                  },
-                  child: Text('return to home yippeeee'),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text('Home!'),
                 ),
               ),
-          Expanded(
-            child:TimePlanner(
-              // time will be start at this hour on table
-              startHour: 6,
-              // time will be end at this hour on table
-              endHour: 23,
-              setTimeOnAxis: true,
-              // each header is a column and a day
-              headers: [
-                TimePlannerTitle(
-                  date: "3/10/2021",
-                  title: "Sunday",
-                ),
-                TimePlannerTitle(
-                  date: "3/2024",
-                  title: "Monday",
-                ),
-                TimePlannerTitle(
-                  date: "3/12/2021",
-                  title: "Tuesday",
-                ),
-                TimePlannerTitle(
-                  date: "3/10/2021",
-                  title: "Wednesday",
-                ),
-                TimePlannerTitle(
-                  date: "3/11/2021",
-                  title: "Thursday",
-                ),
-                TimePlannerTitle(
-                  date: "3/12/2021",
-                  title: "Friday",
-                ),
-                TimePlannerTitle(
-                  date: "",
-                  title: "Saturday")
-              ],
-              // List of task will be show on the time planner
-              tasks: tasks,
-            ),
-          ),
+              Expanded( child: WeekView(),),
         ],
       ),
     );
