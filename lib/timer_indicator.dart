@@ -25,19 +25,19 @@ class _TimerIndicatorState extends State<TimerIndicator> {
         CircularPercentIndicator(
           radius: 80.0,
           lineWidth: 15.0,
-          percent: ((widget.totalTimeinSeconds-((widget.minutes*60)+widget.seconds))/widget.totalTimeinSeconds)??0.5,
+          percent: (widget.totalTimeinSeconds-((widget.minutes*60)+widget.seconds))/widget.totalTimeinSeconds,
           //if we have invisible timer set to true, we use bg color, else we use green. will need to pay attention for dark mode
-          //progressColor: MyHomePageState.mainVars['Invisible Timer']?Theme.of(context).colorScheme.primaryContainer:(Colors.green),
+          progressColor: MyHomePageState.mainVars['Invisible Timer']?Theme.of(context).colorScheme.primaryContainer:(Colors.green),
           circularStrokeCap: CircularStrokeCap.round,
           //
           //linear gradient doesn't really work properly with arcType.FULL
-          linearGradient: LinearGradient(colors: [Theme.of(context).colorScheme.primaryContainer,Colors.green]),
-          rotateLinearGradient: true,
+          //linearGradient: LinearGradient(colors: [Theme.of(context).colorScheme.primaryContainer,Colors.green]),
+          //rotateLinearGradient: true,
           animation: true,
           //curve: Curves.linear,
           animationDuration: 1000,
           backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-          //arcType: ArcType.FULL,
+          arcType: ArcType.FULL,
           animateFromLastPercent: true,
           center: Text(
                   '${widget.minutes}:${widget.seconds}',

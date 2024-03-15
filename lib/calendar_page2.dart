@@ -2,23 +2,14 @@ import 'main.dart';
 import 'package:flutter/material.dart';
 import 'package:time_planner/time_planner.dart';
 
-
-//TODO:
-//Add a way to add events
-//  pop-out widget, with a toggle for one-time/repeating event. 
-//add a CLEAN way to show the time/date
-//  update each week based on tehe time
-//add a way to pinch/zoom out to see the whole schedule
-//maybe find a way to shrink the height of the time (rows?)
-
-class MyCalendarPage extends StatefulWidget {
-  const MyCalendarPage({super.key});
+class MyCalendarPage2 extends StatefulWidget {
+  const MyCalendarPage2({super.key});
 
   @override
-  State<MyCalendarPage> createState() => MyCalendarPageState();
+  State<MyCalendarPage2> createState() => MyCalendarPageState();
 }
 
-class MyCalendarPageState extends State<MyCalendarPage> {
+class MyCalendarPageState extends State<MyCalendarPage2> {
   
 
   @override
@@ -105,4 +96,3 @@ class MyCalendarPageState extends State<MyCalendarPage> {
     );
   }
 }
-

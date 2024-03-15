@@ -1,39 +1,36 @@
+//DONE First, make sure we don't already have a periodic timer running; we don't want concurrent runs
+//DONE guarantee we have single, UNIQUE timer to be running at any given time.
+//DONE check if there is currently a timer. if there IS, then do nothing FOR NOW.
+//DONE if there isn't any, then we want to add one.
+//DONE in future, let's add some logic so if we have one, then we can force stop, or go right to a break.
+//ALL LOGIC DONE FOR NOW
+//TIME TO ADD NEW UI 🤮
+//DONE we can do this by adjusting the UI to remove begin session and add 2 more buttons.
+//DONE we should do this on a separate row of buttons.
 
-    //DONE First, make sure we don't already have a periodic timer running; we don't want concurrent runs 
-    //DONE guarantee we have single, UNIQUE timer to be running at any given time. 
-    //DONE check if there is currently a timer. if there IS, then do nothing FOR NOW. 
-    //DONE if there isn't any, then we want to add one.
-    //DONE in future, let's add some logic so if we have one, then we can force stop, or go right to a break.
-    //ALL LOGIC DONE FOR NOW
-    //TIME TO ADD NEW UI 🤮
-    //DONE we can do this by adjusting the UI to remove begin session and add 2 more buttons.
-    //DONE we should do this on a separate row of buttons.
-
-    //DONE add Settings page
-    //DONE add overflow time option functionality
-    //DONE add background functionality
-    // bg func is done, without adding anything? leaves me confused but very pleased.
-    // Brush up the logic
-    //  check for extreme conditions FIRST, so check if we've forced the end FIRST, that kind of stuff.
-    //Add sound 
-    // DONE-ISH -chime when timers finish
-    // unneeded tbh, for now. -on button press?
-    //  DONE-for the most part-test sound samples 
+//DONE add Settings page
+//DONE add overflow time option functionality
+//DONE add background functionality
+// bg func is done, without adding anything? leaves me confused but very pleased.
+// Brush up the logic
+//  check for extreme conditions FIRST, so check if we've forced the end FIRST, that kind of stuff.
+//Add sound
+// DONE-ISH -chime when timers finish
+// unneeded tbh, for now. -on button press?
+//  DONE-for the most part-test sound samples
 //TODO:
 
-    //add Calendar  page
-    //make more elegant method to keep track of time
-    //above done, just set it to minute:second format. 
-    //add animation for the timer
-    //fix start break early button
-    //make units value work properly.
-    //Add a dark mode!!
-    //classic pomodoro button
+//add Calendar  page
+//make more elegant method to keep track of time
+//above done, just set it to minute:second format.
+//add animation for the timer
+//fix start break early button
+//make units value work properly.
+//Add a dark mode!!
+//classic pomodoro button
 
-
-    //add a way to add minutes without needing to tap 60 times.
-    //reformat displays to show minute:second time. 
-
+//add a way to add minutes without needing to tap 60 times.
+//reformat displays to show minute:second time.
 
 import 'dart:async';
 import 'dart:io';
@@ -41,22 +38,36 @@ import 'dart:core';
 import 'package:flutter/material.dart';
 import 'settings_page.dart';
 import 'calendar_page.dart';
+import 'calendar_page2.dart';
 import 'timer_indicator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 //MAKE SURE ALL AUDIO IS IN FLUTTER ASSETS IN THE PUBSPEC.YAML
 import 'package:audioplayers/audioplayers.dart';
-
+import 'package:calendar_view/calendar_view.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {//maybe should be statefulWidget?
+class MyApp extends StatelessWidget {
+  //maybe should be statefulWidget?
   const MyApp({super.key});
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    return CalendarControllerProvider(
+      controller: EventController(),
+      child: MaterialApp(
+        title: 'Tomatillo',
+        theme: ThemeData(
+          useMaterial3: true,
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
+        ),
+        home: const MyHomePage(title: 'Tomatillo\n🐸🍅🐸🍅🐸🍅🐸'),
+      ),
+      // Your initialization for material app.
+    );
     return MaterialApp(
       title: 'Tomatillo',
       theme: ThemeData(
@@ -81,31 +92,28 @@ class MyHomePage extends StatefulWidget {
   // always marked "final".
 
   final String title;
- 
+
   @override
   State<MyHomePage> createState() => MyHomePageState();
 }
 //maybe make 2 new classes and whole pages for settings and calendar, and just build them like that?
 //I guess we'll find out if the session is paused, interupted, or continues as normal while in a different widget.
 
-
 class MyHomePageState extends State<MyHomePage> {
 //instead of having all these vars like this, put them all in a dictionary!!
-static  Map mainVars = {
-  'Work Time' : 10,//total time for work session
-  'Break Time' : 5,//total time for break session
-  'Total Cycles' : 3,//total work/break cycles to run
-  'Overflow Time' : true,
-  'Invisible Timer' : false,
-  'Units' : 'seconds',
-  
-};
-
+  static Map mainVars = {
+    'Work Time': 10, //total time for work session
+    'Break Time': 5, //total time for break session
+    'Total Cycles': 3, //total work/break cycles to run
+    'Overflow Time': true,
+    'Invisible Timer': false,
+    'Units': 'seconds',
+  };
 
 //next we want to put these into persistent memory
 //NOTE: ALL PERSISTENT MEMORY KEYS **MUST** MATCH mainVars KEYS
-//pulls data for our map from persistent memory 
-Future<void> _loadData() async {
+//pulls data for our map from persistent memory
+  Future<void> _loadData() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       //if we ever have more than like 10 vars, we'll need to properly systematize this. use iteration and type checking.
@@ -114,212 +122,207 @@ Future<void> _loadData() async {
       // mainVars['Total Cycles'] = prefs.getInt('Total Cycles') ?? mainVars['Total Cycles'];
       // mainVars['Overflow Time'] = prefs.getBool('Overflow Time') ?? mainVars['Overflow Time'];
 //If the stored data is null, update it with the base data. otherwise, update the base data with the stored data.
-      prefs.getInt('Work Time') == null ? (prefs.setInt('Work Time',mainVars['Work Time'])):(mainVars['Work Time']=prefs.getInt('Work Time'));
-      prefs.getInt('Break Time') == null ? (prefs.setInt('Break Time',mainVars['Break Time'])):(mainVars['Break Time']=prefs.getInt('Break Time'));
-      prefs.getInt('Total Cycles') == null ? (prefs.setInt('Total Cycles',mainVars['Total Cycles'])):(mainVars['Total Cycles']=prefs.getInt('Total Cycles'));
-      prefs.getBool('Overflow Time') == null ? (prefs.setBool('Overflow Time',mainVars['Overflow Time'])):(mainVars['Overflow Time']=prefs.getBool('Overflow Time'));
-      prefs.getBool('Invisible Timer') == null ? (prefs.setBool('Invisible Timer',mainVars['Invisible Timer'])):(mainVars['Invisible Timer']=prefs.getBool('Invisible Timer'));
-      prefs.getString('Units') == null ? (prefs.setString('Units',mainVars['Units'])):(mainVars['Units']=prefs.getString('Units'));
-
+      prefs.getInt('Work Time') == null
+          ? (prefs.setInt('Work Time', mainVars['Work Time']))
+          : (mainVars['Work Time'] = prefs.getInt('Work Time'));
+      prefs.getInt('Break Time') == null
+          ? (prefs.setInt('Break Time', mainVars['Break Time']))
+          : (mainVars['Break Time'] = prefs.getInt('Break Time'));
+      prefs.getInt('Total Cycles') == null
+          ? (prefs.setInt('Total Cycles', mainVars['Total Cycles']))
+          : (mainVars['Total Cycles'] = prefs.getInt('Total Cycles'));
+      prefs.getBool('Overflow Time') == null
+          ? (prefs.setBool('Overflow Time', mainVars['Overflow Time']))
+          : (mainVars['Overflow Time'] = prefs.getBool('Overflow Time'));
+      prefs.getBool('Invisible Timer') == null
+          ? (prefs.setBool('Invisible Timer', mainVars['Invisible Timer']))
+          : (mainVars['Invisible Timer'] = prefs.getBool('Invisible Timer'));
+      prefs.getString('Units') == null
+          ? (prefs.setString('Units', mainVars['Units']))
+          : (mainVars['Units'] = prefs.getString('Units'));
     });
   }
 
   //logic vars
-  int mainTimerCount =0; //main timer count for pomodoro timer
-  int totalTimeForCycleinSeconds=0;
-  int cyclesRemaining=0;
-  int timeRemaining  =0; //overflow time when jump to pause/break time.
-  bool onBreak   = false; //are we on a break or on a work session?
+  int mainTimerCount = 0; //main timer count for pomodoro timer
+  int totalTimeForCycleinSeconds = 0;
+  int cyclesRemaining = 0;
+  int timeRemaining = 0; //overflow time when jump to pause/break time.
+  bool onBreak = false; //are we on a break or on a work session?
   bool setPaused = false;
-  bool timerExists=false; //does a timer currently exist/are we on a cycle?
-//we can probably replace this with if mainVars['Total Cycles']>1? no. if we pause the timer then we need to 
+  bool timerExists = false; //does a timer currently exist/are we on a cycle?
+//we can probably replace this with if mainVars['Total Cycles']>1? no. if we pause the timer then we need to
 //save time remaining, kill timer, run remaining time on a single timer, then run regular timer again, right?
 //maybe we go for that a little later.
-  bool forceEnd  = false;
+  bool forceEnd = false;
   //testing vars
-  String tempDidWeFinish = '';//acts as a way to display state so we have our prototype 
+  String tempDidWeFinish =
+      ''; //acts as a way to display state so we have our prototype
   //before we start working on adding widget changes and building new components based on state.
   //I think we'll need to change the var names and structure a bit for clarity. onBreak vs setPaused vs timerExists are very similar and should be made
   //more DISTINCT.
 
   final player = AudioPlayer();
 
-  
-
   @override
   void initState() {
-      super.initState();
-      _loadData();
-    }
- 
-    //what we do on start. Just so we can add things to the start of the work session if need be.
-    _startPomodoro(){
-    if (!timerExists){
+    super.initState();
+    _loadData();
+  }
 
-      tempDidWeFinish='onPomodoro!';
+  //what we do on start. Just so we can add things to the start of the work session if need be.
+  _startPomodoro() {
+    if (!timerExists) {
+      tempDidWeFinish = 'onPomodoro!';
       _startWorkSession(mainVars['Work Time'], mainVars['Total Cycles']);
-        }
     }
+  }
 
-    //using recursion to sort this shit out. garbage code. very bad. D--  
-    _startTimer(timeToRun, cycles){
-      //once every second, decrease the time by a second (duh)
-      timerExists=true;
-      mainTimerCount= timeToRun+(mainVars['Overflow Time']? timeRemaining:0);
-      totalTimeForCycleinSeconds=mainTimerCount;
-      timeRemaining=0;
-      Timer.periodic(const Duration(seconds: 1), (timer) { 
-        print('timer count: $mainTimerCount');
-        setState(() {
-          if (!(mainTimerCount<1 || setPaused)){//if we don't have an end condition, tick a second.
-            mainTimerCount--;
+  //using recursion to sort this shit out. garbage code. very bad. D--
+  _startTimer(timeToRun, cycles) {
+    //once every second, decrease the time by a second (duh)
+    timerExists = true;
+    mainTimerCount =
+        timeToRun + (mainVars['Overflow Time'] ? timeRemaining : 0);
+    totalTimeForCycleinSeconds = mainTimerCount;
+    timeRemaining = 0;
+    Timer.periodic(const Duration(seconds: 1), (timer) {
+      print('timer count: $mainTimerCount');
+      setState(() {
+        if (!(mainTimerCount < 1 || setPaused)) {
+          //if we don't have an end condition, tick a second.
+          mainTimerCount--;
+        } else {
+          //all end conditions/swap state logic
+          if (setPaused) {
+            timeRemaining =
+                mainTimerCount; //if we set pause, we add remaining time to next break time
+            //now we have to make sure we go to the break.
+            //we can do onBreak=!onBreak to skip both sides this way. that way
+            //the button becomes less toBREAK and more end-early, saving time.
+            //currently ALWAYS goes to a break and stacks break time. not the worst idea for now.
+            setPaused = false;
+            onBreak = false;
           }
-          else{//all end conditions/swap state logic
-            if(setPaused){
-              timeRemaining=mainTimerCount;//if we set pause, we add remaining time to next break time
-              //now we have to make sure we go to the break.
-              //we can do onBreak=!onBreak to skip both sides this way. that way
-              //the button becomes less toBREAK and more end-early, saving time. 
-              //currently ALWAYS goes to a break and stacks break time. not the worst idea for now.
-              setPaused=false;
-              onBreak=false;
+          timer.cancel();
+          timerExists = false;
+          print('$cycles, $onBreak,$setPaused ');
+
+          if (forceEnd) {
+            //force end event.
+            forceEnd = false; //maybe this could cause issues? I don't think so.
+            onBreak = false;
+            setPaused = false;
+            cyclesRemaining = 0;
+            timeRemaining = 0;
+            mainTimerCount = 0;
+            tempDidWeFinish = "forced the end!";
+          } else if (cycles > 1) {
+            //if we have a cycle left, then we do a work/break cycle. else, we only do a work cycle.
+            if (onBreak) {
+              _startWorkSession(mainVars['Work Time'], cycles - 1);
+              onBreak = false;
+              tempDidWeFinish = "currently at work";
+            } else {
+              _startBreak(mainVars['Break Time'], cycles);
+              setPaused = false;
+              onBreak = true;
+              tempDidWeFinish = "currently on a break";
             }
-            timer.cancel();
-            timerExists=false;
-            print('$cycles, $onBreak,$setPaused ');
-
-            if (forceEnd){
-              //force end event.
-              forceEnd=false;//maybe this could cause issues? I don't think so.
-              onBreak=false;
-              setPaused=false;
-              cyclesRemaining=0;
-              timeRemaining=0;
-              mainTimerCount=0;
-              tempDidWeFinish="forced the end!";
-            }
-            else if (cycles>1){//if we have a cycle left, then we do a work/break cycle. else, we only do a work cycle.
-              if (onBreak){
-                  _startWorkSession(mainVars['Work Time'], cycles-1);
-                  onBreak=false;
-                  tempDidWeFinish="currently at work";
-
-                }
-                else{
-                  
-                  _startBreak(mainVars['Break Time'], cycles);
-                  setPaused=false;
-                  onBreak=true;
-                  tempDidWeFinish="currently on a break";
-                }
-            }
-            else{
-              tempDidWeFinish= "finished a whole set!";
-              //completion event. if no more cycles, and we finish. 
-              //this can only happen during a _startBreak session which doesn't make much sense.
-              //why force yourself to sit through the break?
-            }
-          }  
-        });
+          } else {
+            tempDidWeFinish = "finished a whole set!";
+            //completion event. if no more cycles, and we finish.
+            //this can only happen during a _startBreak session which doesn't make much sense.
+            //why force yourself to sit through the break?
+          }
+        }
       });
-      print('ENDED _startTimer()');
+    });
+    print('ENDED _startTimer()');
+  } //Seems that the timer we WANT is timer.periodic,
+  //since we can update the visual value along with it.
+  // the original timer is just a one-of thing for events I think.
 
-    }//Seems that the timer we WANT is timer.periodic, 
-    //since we can update the visual value along with it.
-    // the original timer is just a one-of thing for events I think.
+  _startWorkSession(int time, int cycle) {
+    setState(() {
+      cyclesRemaining = cycle - 1;
+    });
+    _startTimer(time, cycle);
 
+    //add chime
+    player.play(AssetSource('audio/bing.mp3'));
+  }
 
-    _startWorkSession(int time, int cycle) {
-            setState(() {
-        cyclesRemaining=cycle-1;
-      });
-      _startTimer(time, cycle);
+  _startBreak(int time, int cycle) {
+    player.play(AssetSource('audio/onBreak.mp3'));
+    _startTimer(time, cycle); //this doesn't seem right,...
+    //add *chime* I don't want to play a chime at the start, but when a cycle FINISHES...
+  }
 
-      
-      //add chime
-      player.play(AssetSource('audio/bing.mp3'));
-    }
-    
-    _startBreak(int time, int cycle) {
+  _endPomodoro() {
+    //immediately ends the session (no more work, no more break)
+    setState(() {
+      mainTimerCount = 0;
+      forceEnd = true;
+    });
+  } //possibly unneeded
 
-      player.play(AssetSource('audio/onBreak.mp3'));
-      _startTimer(time, cycle);//this doesn't seem right,...
-      //add *chime* I don't want to play a chime at the start, but when a cycle FINISHES...
-
-      
-    }
-
-    _endPomodoro(){
-      //immediately ends the session (no more work, no more break)
-      setState(() {
-        mainTimerCount=0;
-        forceEnd=true;
-      });
-      
-
-    }//possibly unneeded
-
-    _pausePomodoro(){
-      //immediately jumps to the break for the cycle, extra remaining time is added to the break
-      setState(() {
-      setPaused=true;
-      });
-    }
-
+  _pausePomodoro() {
+    //immediately jumps to the break for the cycle, extra remaining time is added to the break
+    setState(() {
+      setPaused = true;
+    });
+  }
 
   //WIDGET BUILD
-    breakOrAlterSession(onBreak){
-      if (!timerExists){
+  breakOrAlterSession(onBreak) {
+    if (!timerExists) {
+      return (ElevatedButton.icon(
+        onPressed: () {
+          _startPomodoro();
+        },
+        icon: const Icon(Icons.access_alarm),
 
-        return (ElevatedButton.icon(
-          onPressed: (){
-            _startPomodoro();
-            },
-          icon: const Icon(Icons.access_alarm),
-          
-          //add padding here, and later remove the + button for a nav bar at the bottom
-          label: const Text("Begin Session"),
-        ));
-      }
-      else{
-        return (Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
+        //add padding here, and later remove the + button for a nav bar at the bottom
+        label: const Text("Begin Session"),
+      ));
+    } else {
+      return (Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
           ElevatedButton.icon(
-          onPressed: (){
-            _endPomodoro();
+            onPressed: () {
+              _endPomodoro();
             },
-          icon: const Icon(Icons.stop_circle),
-          label: const Text("End Session Early"),
-        ),
-        (!onBreak)? (ElevatedButton.icon(
-          onPressed: (){
-            _pausePomodoro();
-            },
-          icon: const Icon(Icons.pause_circle_outline),
-          label: const Text("Start Break Early"),
-        )) : 
-        (ElevatedButton.icon(
-          onPressed: (){
-
-            print("object");
-            setState(() {     
-              onBreak=false;
-              _startPomodoro();
-            });
-          },
-          icon: const Icon(Icons.pause_circle_outline),
-          //TODO: ADD LOGIC SO WHEN WE RESTART AFTER THE BREAK WE DON'T LOSE OUR TIME.
-          //the whole end break early logic doesn't work, I think.
-          //if we start a break early, it just appends the time to the next timer. not next break, but even next set. 
-          label: const Text("End Break Early"),
-        )),
-        ],));
-      }
-          
+            icon: const Icon(Icons.stop_circle),
+            label: const Text("End Session Early"),
+          ),
+          (!onBreak)
+              ? (ElevatedButton.icon(
+                  onPressed: () {
+                    _pausePomodoro();
+                  },
+                  icon: const Icon(Icons.pause_circle_outline),
+                  label: const Text("Start Break Early"),
+                ))
+              : (ElevatedButton.icon(
+                  onPressed: () {
+                    print("object");
+                    setState(() {
+                      onBreak = false;
+                      _startPomodoro();
+                    });
+                  },
+                  icon: const Icon(Icons.pause_circle_outline),
+                  //TODO: ADD LOGIC SO WHEN WE RESTART AFTER THE BREAK WE DON'T LOSE OUR TIME.
+                  //the whole end break early logic doesn't work, I think.
+                  //if we start a break early, it just appends the time to the next timer. not next break, but even next set.
+                  label: const Text("End Break Early"),
+                )),
+        ],
+      ));
     }
-
-
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -327,19 +330,17 @@ Future<void> _loadData() async {
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
-    int minutes= (mainTimerCount/60).floor();
-    int seconds = mainTimerCount%60;
+    int minutes = (mainTimerCount / 60).floor();
+    int seconds = mainTimerCount % 60;
     Widget beginOrAlterSession = breakOrAlterSession(onBreak);
 
     return Scaffold(
       appBar: AppBar(
-        
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         centerTitle: true,
         title: Text(widget.title),
         backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-        
       ),
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
@@ -362,58 +363,78 @@ Future<void> _loadData() async {
               // center the children vertically; the main axis here is the vertical
               // axis because Columns are vertical (the cross axis would be
               // horizontal).
-              
+
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-
-                
                 Padding(
                   padding: const EdgeInsets.all(50.0),
                   child: Text(
                     tempDidWeFinish,
                   ),
                 ),
-
-                TimerIndicator(totalTimeinSeconds: totalTimeForCycleinSeconds, minutes: minutes, seconds:seconds,
+                TimerIndicator(
+                  totalTimeinSeconds: totalTimeForCycleinSeconds,
+                  minutes: minutes,
+                  seconds: seconds,
                 ),
                 Padding(padding: EdgeInsetsDirectional.symmetric()),
-
                 Text(
                   'breaks remaining: $cyclesRemaining',
                   style: Theme.of(context).textTheme.labelSmall,
                 ),
-                const Padding(padding: EdgeInsets.fromLTRB(0,0,0,20.0)),
-
+                const Padding(padding: EdgeInsets.fromLTRB(0, 0, 0, 20.0)),
                 beginOrAlterSession,
-
                 const Padding(padding: EdgeInsets.all(30)),
                 Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [// row of buttons for the main page
-                      ElevatedButton.icon(//this brings us to the calendar page
-                    onPressed: (){
-                      //navigate to Calendar Page
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => const MyCalendarPage()));
-                      
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // row of buttons for the main page
+                    ElevatedButton.icon(
+                      //this brings us to the calendar page
+                      onPressed: () {
+                        //navigate to Calendar Page
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const MyCalendarPage()));
                       },
-                    icon: const Icon(Icons.calendar_month),
-                    
-                    //add padding here, and later remove the + button for a nav bar at the bottom
-                    label: const Text("Calendar"),
-                  ),
-                  const Padding(padding: EdgeInsets.all(8)),
+                      icon: const Icon(Icons.calendar_month),
 
-                  ElevatedButton.icon(
-                    onPressed: (){
-                      //navigate to Setting Page
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => const MySettingsPage()));
+                      //add padding here, and later remove the + button for a nav bar at the bottom
+                      label: const Text("Calendar"),
+                    ),
+                    const Padding(padding: EdgeInsets.all(8)),
+
+                    ElevatedButton.icon(
+                      //this brings us to the calendar page
+                      onPressed: () {
+                        //navigate to Calendar Page
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const MyCalendarPage2()));
                       },
-                    icon: const Icon(Icons.settings),
-                    
-                    //add padding here, and later remove the + button for a nav bar at the bottom
-                    label: const Text("Settings"),
-                  )
-                    ],
+                      icon: const Icon(Icons.calendar_today),
+
+                      //add padding here, and later remove the + button for a nav bar at the bottom
+                      label: const Text("Calendar"),
+                    ),
+                    const Padding(padding: EdgeInsets.all(8)),
+
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        //navigate to Setting Page
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const MySettingsPage()));
+                      },
+                      icon: const Icon(Icons.settings),
+
+                      //add padding here, and later remove the + button for a nav bar at the bottom
+                      label: const Text("Settings"),
+                    )
+                  ],
                 ),
               ],
             ),
