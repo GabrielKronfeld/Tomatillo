@@ -17,20 +17,25 @@
 //Add sound
 // DONE-ISH -chime when timers finish
 // unneeded tbh, for now. -on button press?
-//  DONE-for the most part-test sound samples
+//DONE-for the most part-test sound samples
+//DONE add Calendar  page
+//DONE above done, just set it to minute:second format.
+//DONE add animation for the timer
+//DONE reformat displays to show minute:second time.
 //TODO:
 
-//add Calendar  page
+
 //make more elegant method to keep track of time
-//above done, just set it to minute:second format.
-//add animation for the timer
 //fix start break early button
 //make units value work properly.
 //Add a dark mode!!
 //classic pomodoro button
-
 //add a way to add minutes without needing to tap 60 times.
-//reformat displays to show minute:second time.
+//make timer invisible when there is no timer running.
+///Tried above by checking if TimerExists in timer_indicator, but it always comes up false. weird logic here.
+
+
+
 
 import 'dart:async';
 import 'dart:io';
@@ -44,6 +49,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 //MAKE SURE ALL AUDIO IS IN FLUTTER ASSETS IN THE PUBSPEC.YAML
 import 'package:audioplayers/audioplayers.dart';
 import 'package:calendar_view/calendar_view.dart';
+import 'timer_logic.dart';
+import 'all_theme_colors.dart';
 
 void main() {
   runApp(const MyApp());
@@ -171,8 +178,9 @@ class MyHomePageState extends State<MyHomePage> {
   }
 
   //what we do on start. Just so we can add things to the start of the work session if need be.
+  //TIMER EXISTS WHEN WE WANT TO END THE BREAK EARLY! WORK SESSSION DOES NOT GO!
   _startPomodoro() {
-    if (!timerExists) {
+    if (!timerExists ) {
       tempDidWeFinish = 'onPomodoro!';
       _startWorkSession(mainVars['Work Time'], mainVars['Total Cycles']);
     }
@@ -276,10 +284,12 @@ class MyHomePageState extends State<MyHomePage> {
 
   //WIDGET BUILD
   breakOrAlterSession(onBreak) {
+    print('timer$timerExists');
     if (!timerExists) {
       return (ElevatedButton.icon(
         onPressed: () {
           _startPomodoro();
+          
         },
         icon: const Icon(Icons.access_alarm),
 
@@ -433,7 +443,20 @@ class MyHomePageState extends State<MyHomePage> {
 
                       //add padding here, and later remove the + button for a nav bar at the bottom
                       label: const Text("Settings"),
-                    )
+                    ),
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        //navigate to Setting Page
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const MyWidget()));
+                      },
+                      icon: const Icon(Icons.settings),
+
+                      //add padding here, and later remove the + button for a nav bar at the bottom
+                      label: const Text("color"),
+                    ),
                   ],
                 ),
               ],

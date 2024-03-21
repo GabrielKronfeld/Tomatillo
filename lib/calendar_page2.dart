@@ -14,8 +14,12 @@ class MyCalendarPage2 extends StatefulWidget {
 class MyCalendarPageState extends State<MyCalendarPage2> {
   
 
+
+    //this is the fancier, more in-depth calendar import
+
   @override
   Widget build(BuildContext context) {
+
 
     List<TimePlannerTask> tasks = [
     TimePlannerTask(
@@ -40,20 +44,22 @@ class MyCalendarPageState extends State<MyCalendarPage2> {
     Color bgColor = Theme.of(context).colorScheme.primaryContainer;
     return Scaffold(
       backgroundColor: bgColor,
-      body: Column(
-        children: [
-
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Text('Home!'),
+      body: SafeArea(
+        child: Column(
+          children: [
+      
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(0.0, 0, 0, 8.0),
+                  child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text('Home!'),
+                  ),
                 ),
-              ),
-              Expanded( child: WeekView(),),
-        ],
+                Expanded( child: WeekView(),),
+          ],
+        ),
       ),
     );
   }

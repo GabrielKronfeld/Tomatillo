@@ -4,6 +4,7 @@ import 'package:percent_indicator/percent_indicator.dart';
 
 class TimerIndicator extends StatefulWidget {
 
+ 
   int totalTimeinSeconds=1;//as seconds
   int minutes=0;
   int seconds=0;
@@ -14,14 +15,18 @@ class TimerIndicator extends StatefulWidget {
 }
 
 class _TimerIndicatorState extends State<TimerIndicator> {
-
   final color=true;
 
   @override
   Widget build(BuildContext context) {
 
+
+
     return Column(
+      
       children: [
+        
+        //MyHomePageState().timerExists?
         CircularPercentIndicator(
           radius: 80.0,
           lineWidth: 15.0,
@@ -39,11 +44,17 @@ class _TimerIndicatorState extends State<TimerIndicator> {
           backgroundColor: Theme.of(context).colorScheme.primaryContainer,
           arcType: ArcType.FULL,
           animateFromLastPercent: true,
-          center: Text(
-                  '${widget.minutes}:${widget.seconds}',
+          center: (Text(
+                  //adds leading zero to seconds <9
+                  widget.seconds>9?
+                    '${widget.minutes}:${widget.seconds}':'${widget.minutes}:0${widget.seconds}',
                   style: Theme.of(context).textTheme.headlineLarge,
-                ),
+                )),
 
+        // ):Container(
+        //   width: 100,
+        //   height: 100,
+        //   color: Theme.of(context).colorScheme.primaryContainer,
         ),
       ],
     );
