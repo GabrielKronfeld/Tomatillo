@@ -4,6 +4,9 @@ import 'main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 
+//replace overflow time and invisible timer with switches
+
+
 class MySettingsPage extends StatefulWidget{
   const MySettingsPage({super.key});
   

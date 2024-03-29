@@ -33,6 +33,8 @@
 //add a way to add minutes without needing to tap 60 times.
 //make timer invisible when there is no timer running.
 ///Tried above by checking if TimerExists in timer_indicator, but it always comes up false. weird logic here.
+//implement UNITS setting
+//replace overflow time and invisible timer with switches
 
 
 
@@ -63,13 +65,17 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    final ColorScheme colorScheme = ColorScheme.fromSeed(
+      brightness: MediaQuery.platformBrightnessOf(context),
+      seedColor: Colors.green,
+    );
     return CalendarControllerProvider(
       controller: EventController(),
       child: MaterialApp(
         title: 'Tomatillo',
         theme: ThemeData(
           useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
+          colorScheme: ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 25, 68, 26)),
         ),
         home: const MyHomePage(title: 'Tomatillo\n🐸🍅🐸🍅🐸🍅🐸'),
       ),
@@ -444,7 +450,7 @@ class MyHomePageState extends State<MyHomePage> {
                       //add padding here, and later remove the + button for a nav bar at the bottom
                       label: const Text("Settings"),
                     ),
-                    ElevatedButton.icon(
+                    /*ElevatedButton.icon(
                       onPressed: () {
                         //navigate to Setting Page
                         Navigator.push(
@@ -456,7 +462,7 @@ class MyHomePageState extends State<MyHomePage> {
 
                       //add padding here, and later remove the + button for a nav bar at the bottom
                       label: const Text("color"),
-                    ),
+                    ),*/
                   ],
                 ),
               ],
