@@ -1,7 +1,10 @@
 # tomatillo_flutter
 
-A new Flutter project.
+A repeating-only weekly calendar plus timer to efficiently organize your routine through time.
+Have the Pomodoro Technique automatically start when wanted and keep you on track through your days.
 
+
+Currently in Alpha.
 ## Getting Started
 
 This project is a starting point for a Flutter application.
