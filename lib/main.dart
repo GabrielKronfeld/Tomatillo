@@ -22,22 +22,19 @@
 //DONE above done, just set it to minute:second format.
 //DONE add animation for the timer
 //DONE reformat displays to show minute:second time.
-//TODO:
 
+//TODO:
 
 //make more elegant method to keep track of time
 //fix start break early button
-//make units value work properly.
 //Add a dark mode!!
 //classic pomodoro button
 //add a way to add minutes without needing to tap 60 times.
 //make timer invisible when there is no timer running.
 ///Tried above by checking if TimerExists in timer_indicator, but it always comes up false. weird logic here.
-//implement UNITS setting
+//implement UNITS setting, //make units value work properly.
 //replace overflow time and invisible timer with switches
-
-
-
+//add better memory management
 
 import 'dart:async';
 import 'dart:io';
@@ -53,10 +50,43 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:calendar_view/calendar_view.dart';
 import 'timer_logic.dart';
 import 'all_theme_colors.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:path/path.dart';
 
-void main() {
+void main() async {
   runApp(const MyApp());
+  //added all
+  // Avoid errors caused by flutter upgrade.
+// Importing 'package:flutter/widgets.dart' is required.
+  WidgetsFlutterBinding.ensureInitialized();
+// Open the database and store the reference.
+  final database = openDatabase(
+    // Set the path to the database. Note: Using the `join` function from the
+    // `path` package is best practice to ensure the path is correctly
+    // constructed for each platform.
+    join(await getDatabasesPath(), 'calendar_events.db'),
+    onCreate: (db, version) {
+      // Run the CREATE TABLE statement on the database.
+      return db.execute(
+        'CREATE TABLE events(id INTEGER PRIMARY KEY, name TEXT, minutesduration INTEGER, startDay INTEGER, startHour INTEGER, startMinute INTEGER)',
+      );
+    },
+    // Set the version. This executes the onCreate function and provides a
+    // path to perform database upgrades and downgrades.
+    version: 1,
+  );
 }
+/**
+ * 
+ * required this.minutesDuration,
+      required this.dateTime,
+      this.daysDuration,
+      this.color,
+      this.onTap,
+      this.child,
+      this.leftSpace,
+      this.widthTask})
+ */
 
 class MyApp extends StatelessWidget {
   //maybe should be statefulWidget?
@@ -75,7 +105,8 @@ class MyApp extends StatelessWidget {
         title: 'Tomatillo',
         theme: ThemeData(
           useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 25, 68, 26)),
+          colorScheme:
+              ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 25, 68, 26)),
         ),
         home: const MyHomePage(title: 'Tomatillo\n🐸🍅🐸🍅🐸🍅🐸'),
       ),
@@ -186,7 +217,7 @@ class MyHomePageState extends State<MyHomePage> {
   //what we do on start. Just so we can add things to the start of the work session if need be.
   //TIMER EXISTS WHEN WE WANT TO END THE BREAK EARLY! WORK SESSSION DOES NOT GO!
   _startPomodoro() {
-    if (!timerExists ) {
+    if (!timerExists) {
       tempDidWeFinish = 'onPomodoro!';
       _startWorkSession(mainVars['Work Time'], mainVars['Total Cycles']);
     }
@@ -295,7 +326,6 @@ class MyHomePageState extends State<MyHomePage> {
       return (ElevatedButton.icon(
         onPressed: () {
           _startPomodoro();
-          
         },
         icon: const Icon(Icons.access_alarm),
 
@@ -412,7 +442,7 @@ class MyHomePageState extends State<MyHomePage> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const MyCalendarPage()));
+                                builder: (context) => MyCalendarPage()));
                       },
                       icon: const Icon(Icons.calendar_month),
 

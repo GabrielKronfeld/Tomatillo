@@ -1,17 +1,27 @@
+import 'package:flutter/cupertino.dart';
+
 import 'main.dart';
 import 'package:flutter/material.dart';
 import 'package:time_planner/time_planner.dart';
+import 'calendar_form.dart';
 
 //TODO:
 //Add a way to add events
-//  pop-out widget, with a toggle for one-time/repeating event.
-//add a CLEAN way to show the time/date
+// DONE pop-out widget, with a toggle for one-time/repeating event.
+//add a way to SAVE the forms
+//based off saved forms, generate a new calendar event
+//save the calendar event persistently
+//load all saved calendar events on app-open
+//  add a CLEAN way to show the time/date
 //  update each week based on tehe time
 //add a way to pinch/zoom out to see the whole schedule
 //maybe find a way to shrink the height of the time (rows?)
 
 class MyCalendarPage extends StatefulWidget {
-  const MyCalendarPage({super.key});
+  MyCalendarPage({super.key});
+
+  DateTime timeofDay = DateTime.now();
+  static String sampletext = "a";
 
   @override
   State<MyCalendarPage> createState() => MyCalendarPageState();
@@ -39,9 +49,13 @@ class MyCalendarPageState extends State<MyCalendarPage> {
         color: Theme.of(context).cardColor,
         // day: Index of header, hour: Task will be begin at this hour
         // minutes: Task will be begin at this minutes
-        dateTime: TimePlannerDateTime(day: 0, hour: 14, minutes: 30),
+        dateTime: TimePlannerDateTime(
+            day: 1,
+            hour: widget.timeofDay.hour,
+            minutes: widget.timeofDay.minute),
         // Minutes duration of task
         minutesDuration: 190,
+
         // Days duration of task (use for multi days task)
         daysDuration: 1,
         onTap: () {
@@ -54,70 +68,23 @@ class MyCalendarPageState extends State<MyCalendarPage> {
       ),
     ];
 
-    final _formKey = GlobalKey<FormState>();
-    return Scaffold(
+   return Scaffold(
       floatingActionButton: FloatingActionButton(
         backgroundColor: Theme.of(context).cardColor,
         focusColor: Theme.of(context).cardColor,
-        child: Icon(Icons.add),
-       /* onPressed: () async {
-            await showDialog<void>(
-                context: context,
-                builder: (context) => AlertDialog(
-                      content: Stack(
-                        clipBehavior: Clip.none,
-                        children: <Widget>[
-                          Positioned(
-                            right: -40,
-                            top: -40,
-                            child: InkResponse(
-                              onTap: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: const CircleAvatar(
-                                radius: 15.0,
-                                backgroundColor: Colors.red,
-                                child: Icon(Icons.close),
-                              ),
-                            ),
-                          ),
-                          Form(
-                            key: _formKey,
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: <Widget>[
-                                Padding(
-                                  padding: const EdgeInsets.all(8),
-                                  child: TextFormField(),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.all(8),
-                                  child: TextFormField(),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.all(8),
-                                  child: ElevatedButton(
-                                    child: const Text('Submitß'),
-                                    onPressed: () {
-                                      if (_formKey.currentState!.validate()) {
-                                        _formKey.currentState!.save();
-                                      }
-                                    },
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ));
-        
-        },*/
-      onPressed: (){
-        
-
-
-      },
+        child: const Icon(Icons.add),
+        onPressed: () async {
+          await showDialog<void>(
+              context: context,
+              builder: (context) => AlertDialog(
+                    content: Stack(
+                      clipBehavior: Clip.none,
+                      children: const <Widget>[
+                        EventForm(),
+                      ],
+                    ),
+                  ));
+        },
       ),
       backgroundColor: bgColor,
       body: SafeArea(
@@ -130,9 +97,11 @@ class MyCalendarPageState extends State<MyCalendarPage> {
                 onPressed: () {
                   Navigator.pop(context);
                 },
-                child: Text('return to home yippeeee'),
+                child: const Text('return to home yippeeee'),
               ),
+             
             ),
+            Text('${MyCalendarPage.sampletext}'),
             Expanded(
               child: TimePlanner(
                 style: style,
@@ -143,7 +112,7 @@ class MyCalendarPageState extends State<MyCalendarPage> {
                 setTimeOnAxis: false,
 
                 // each header is a column and a day
-                headers: [
+                headers: const [
                   TimePlannerTitle(
                     date: "3/10/2021",
                     title: "Sunday",

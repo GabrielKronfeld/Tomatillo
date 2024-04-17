@@ -41,6 +41,8 @@ dependencies:
   percent_indicator: ^4.2.3
   time_planner: ^0.1.2+1
   calendar_view: ^1.1.0
+  sqflite: ^2.2.8+4
+  path: ^1.8.2
   
 
 dev_dependencies:
