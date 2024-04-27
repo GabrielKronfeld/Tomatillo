@@ -54,7 +54,6 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
 void main() async {
-  runApp(const MyApp());
   //added all
   // Avoid errors caused by flutter upgrade.
 // Importing 'package:flutter/widgets.dart' is required.
@@ -71,10 +70,12 @@ void main() async {
         'CREATE TABLE events(id INTEGER PRIMARY KEY, name TEXT, minutesduration INTEGER, startDay INTEGER, startHour INTEGER, startMinute INTEGER)',
       );
     },
-    // Set the version. This executes the onCreate function and provides a
-    // path to perform database upgrades and downgrades.
+    // Set the version. This executes the onCreate function and provides <--good to know!
+    // a path to perform database upgrades and downgrades.
     version: 1,
   );
+  //loading the DB BEFORE we run the app. ...maybe inefficient actually. might wanna swap order.
+  runApp(const MyApp());
 }
 /**
  * 
@@ -149,9 +150,11 @@ class MyHomePageState extends State<MyHomePage> {
     'Work Time': 10, //total time for work session
     'Break Time': 5, //total time for break session
     'Total Cycles': 3, //total work/break cycles to run
+    'CalendarEntries': 0, //how many entries ever made for Calendar. Used for UID in db.
     'Overflow Time': true,
     'Invisible Timer': false,
     'Units': 'seconds',
+
   };
 
 //next we want to put these into persistent memory
@@ -169,18 +172,27 @@ class MyHomePageState extends State<MyHomePage> {
       prefs.getInt('Work Time') == null
           ? (prefs.setInt('Work Time', mainVars['Work Time']))
           : (mainVars['Work Time'] = prefs.getInt('Work Time'));
+
       prefs.getInt('Break Time') == null
           ? (prefs.setInt('Break Time', mainVars['Break Time']))
           : (mainVars['Break Time'] = prefs.getInt('Break Time'));
+
       prefs.getInt('Total Cycles') == null
           ? (prefs.setInt('Total Cycles', mainVars['Total Cycles']))
           : (mainVars['Total Cycles'] = prefs.getInt('Total Cycles'));
+                
+      prefs.getInt('CalendarEntries') == null
+          ? (prefs.setInt('CalendarEntries', mainVars['CalendarEntries']))
+          : (mainVars['CalendarEntries'] = prefs.getInt('CalendarEntries'));
+
       prefs.getBool('Overflow Time') == null
           ? (prefs.setBool('Overflow Time', mainVars['Overflow Time']))
           : (mainVars['Overflow Time'] = prefs.getBool('Overflow Time'));
+
       prefs.getBool('Invisible Timer') == null
           ? (prefs.setBool('Invisible Timer', mainVars['Invisible Timer']))
           : (mainVars['Invisible Timer'] = prefs.getBool('Invisible Timer'));
+
       prefs.getString('Units') == null
           ? (prefs.setString('Units', mainVars['Units']))
           : (mainVars['Units'] = prefs.getString('Units'));

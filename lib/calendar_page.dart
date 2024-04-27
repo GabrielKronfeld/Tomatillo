@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-
 import 'main.dart';
 import 'package:flutter/material.dart';
 import 'package:time_planner/time_planner.dart';
@@ -42,7 +41,7 @@ class MyCalendarPageState extends State<MyCalendarPage> {
       dividerColor: theme.background,
       //horizontalTaskPadding: 8.0,
     );
-
+    var textforTask= 'this is a task';
     List<TimePlannerTask> tasks = [
       TimePlannerTask(
         // background color for task
@@ -62,7 +61,7 @@ class MyCalendarPageState extends State<MyCalendarPage> {
           setState(() {});
         },
         child: Text(
-          'this is a task',
+          textforTask,
           style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 12),
         ),
       ),
