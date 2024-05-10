@@ -260,6 +260,7 @@ class SettingsModifierWidgetState extends State<SettingsModifierWidget>{
         if (dataName!='Total Cycles' && MyHomePageState.mainVars[dataName]>5){
           step=5;
         }
+        //make this a separate function so we can reuse the code elsewhere
         int data = (prefs.getInt(dataName) ?? 0) - step;//from shared preferences, this subtracts 1 to the int with key dataName.
         prefs.setInt(dataName, data); //this then updates the int with key dataName with the new int. basically a 2 line --.
         MyHomePageState.mainVars[dataName]=prefs.getInt(dataName);//we still need to actually update the mainVars.

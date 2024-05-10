@@ -6,6 +6,7 @@ import 'package:time_planner/time_planner.dart';
 class TPTask extends TimePlannerTask{
   final int id;
   final String title;
+  final int oneTimeEvent;
 
 
 
@@ -13,6 +14,7 @@ class TPTask extends TimePlannerTask{
     super.key,
     required this.id,
     required this.title,
+    required this.oneTimeEvent,
     required super.minutesDuration,
     required super.dateTime,
     
@@ -21,14 +23,17 @@ class TPTask extends TimePlannerTask{
 });
 
 //need *a* function to turn an obj to a map to insert in db
+//return a map mapping 1:1 DIRECTLY to the database table columns!
+// ^^^VERY IMPORTANT!!!!
 Map<String, Object> toMap(){
   return{
-    'id':id,
-    'title':title,
+    'id': id,
+    'title': title,
     'minutesDuration': minutesDuration,
-    'dateTimeDay':dateTime.day,
-    'dateTimeHour':dateTime.hour,
-    'dateTimeMinutes':dateTime.minutes,
+    'dateTimeDay': dateTime.day,
+    'dateTimeHour': dateTime.hour,
+    'dateTimeMinutes': dateTime.minutes,
+    'oneTimeEvent': oneTimeEvent,
     //'color':(color??'0x00000').toString(),//unsure of this. don't feel like implementing color atm.
 
   };

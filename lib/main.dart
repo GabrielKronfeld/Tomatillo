@@ -35,6 +35,12 @@
 //implement UNITS setting, //make units value work properly.
 //replace overflow time and invisible timer with switches
 //add better memory management
+//import data to db
+//EXPORT data from db to calendar
+//chime on start/end of event
+//function in background
+//widget-icon overlay thing from the top for notifications.
+//
 
 import 'dart:async';
 import 'dart:io';
@@ -58,22 +64,23 @@ void main() async {
   // Avoid errors caused by flutter upgrade.
 // Importing 'package:flutter/widgets.dart' is required.
   WidgetsFlutterBinding.ensureInitialized();
+  //we don't actually need to open the DB at the very
 // Open the database and store the reference.
-  final database = openDatabase(
-    // Set the path to the database. Note: Using the `join` function from the
-    // `path` package is best practice to ensure the path is correctly
-    // constructed for each platform.
-    join(await getDatabasesPath(), 'calendar_events.db'),
-    onCreate: (db, version) {
-      // Run the CREATE TABLE statement on the database.
-      return db.execute(
-        'CREATE TABLE events(id INTEGER PRIMARY KEY, name TEXT, minutesduration INTEGER, startDay INTEGER, startHour INTEGER, startMinute INTEGER)',
-      );
-    },
-    // Set the version. This executes the onCreate function and provides <--good to know!
-    // a path to perform database upgrades and downgrades.
-    version: 1,
-  );
+  // final database = openDatabase(
+  //   // Set the path to the database. Note: Using the `join` function from the
+  //   // `path` package is best practice to ensure the path is correctly
+  //   // constructed for each platform.
+  //   join(await getDatabasesPath(), 'calendar_events.db'),
+  //   onCreate: (db, version) {
+  //     // Run the CREATE TABLE statement on the database.
+  //     return db.execute(
+  //       'CREATE TABLE events(id INTEGER PRIMARY KEY, name TEXT, minutesduration INTEGER, startDay INTEGER, startHour INTEGER, startMinute INTEGER)',
+  //     );
+  //   },
+  //   // Set the version. This executes the onCreate function and provides <--good to know!
+  //   // a path to perform database upgrades and downgrades.
+  //   version: 1,
+  // );
   //loading the DB BEFORE we run the app. ...maybe inefficient actually. might wanna swap order.
   runApp(const MyApp());
 }

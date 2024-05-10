@@ -20,13 +20,17 @@ class MyCalendarPage extends StatefulWidget {
   MyCalendarPage({super.key});
 
   DateTime timeofDay = DateTime.now();
-  static String sampletext = "a";
+  static String sampletext = "sampletext";
 
   @override
   State<MyCalendarPage> createState() => MyCalendarPageState();
 }
 
 class MyCalendarPageState extends State<MyCalendarPage> {
+  //update CalendarPage state when child widget passes new data
+  refresh() {
+  setState(() {});
+}
   @override
   Widget build(BuildContext context) {
     ColorScheme theme = Theme.of(context).colorScheme;
@@ -78,8 +82,8 @@ class MyCalendarPageState extends State<MyCalendarPage> {
               builder: (context) => AlertDialog(
                     content: Stack(
                       clipBehavior: Clip.none,
-                      children: const <Widget>[
-                        EventForm(),
+                      children:  <Widget>[
+                        EventForm(notifyParent: refresh),
                       ],
                     ),
                   ));
@@ -100,7 +104,7 @@ class MyCalendarPageState extends State<MyCalendarPage> {
               ),
              
             ),
-            Text('${MyCalendarPage.sampletext}'),
+            Text(MyCalendarPage.sampletext),
             Expanded(
               child: TimePlanner(
                 style: style,
