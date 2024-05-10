@@ -4,17 +4,22 @@ import 'package:flutter/material.dart';
 import 'package:time_planner/time_planner.dart';
 import 'calendar_form.dart';
 
+//DONE Add a way to add events
+//DONE pop-out widget, with a toggle for one-time/repeating event.
+//DONE add a way to SAVE the forms
+//DONE based off saved forms, generate a new calendar event
+//DONE save the calendar event persistently
+
 //TODO:
-//Add a way to add events
-// DONE pop-out widget, with a toggle for one-time/repeating event.
-//add a way to SAVE the forms
-//based off saved forms, generate a new calendar event
-//save the calendar event persistently
+
 //load all saved calendar events on app-open
-//  add a CLEAN way to show the time/date
+//^pull all events from database, add them to tasks list.
+//add way to delete tasks!
+//add way to get rid of one-time events. hard when we don't have a proper date/time management handler here...
+//  add a CLEAN way to show the time/date (yeah fair.)
 //  update each week based on tehe time
-//add a way to pinch/zoom out to see the whole schedule
-//maybe find a way to shrink the height of the time (rows?)
+//add a way to pinch/zoom out to see the whole schedule (low prio)
+//maybe find a way to shrink the height of the time (rows?) (low prio)
 
 class MyCalendarPage extends StatefulWidget {
   MyCalendarPage({super.key});
@@ -46,6 +51,7 @@ class MyCalendarPageState extends State<MyCalendarPage> {
       //horizontalTaskPadding: 8.0,
     );
     var textforTask= 'this is a task';
+    //update the list of tasks based on the database.
     List<TimePlannerTask> tasks = [
       TimePlannerTask(
         // background color for task

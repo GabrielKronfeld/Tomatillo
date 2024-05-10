@@ -3,11 +3,10 @@
 //DONE check if there is currently a timer. if there IS, then do nothing FOR NOW.
 //DONE if there isn't any, then we want to add one.
 //DONE in future, let's add some logic so if we have one, then we can force stop, or go right to a break.
-//ALL LOGIC DONE FOR NOW
+//ALL LOGIC DONE FOR NOW lmao. I thought.
 //TIME TO ADD NEW UI 🤮
 //DONE we can do this by adjusting the UI to remove begin session and add 2 more buttons.
 //DONE we should do this on a separate row of buttons.
-
 //DONE add Settings page
 //DONE add overflow time option functionality
 //DONE add background functionality
@@ -22,10 +21,13 @@
 //DONE above done, just set it to minute:second format.
 //DONE add animation for the timer
 //DONE reformat displays to show minute:second time.
+//DONE chime on start/end of event
+//DONE import data to db
+//DONE??add better memory management
+//kind of a passive/persistent thing right?
 
 //TODO:
-
-//make more elegant method to keep track of time
+//make more elegant method to keep track of time. in what way? for the timer function? yeah.
 //fix start break early button
 //Add a dark mode!!
 //classic pomodoro button
@@ -34,13 +36,18 @@
 ///Tried above by checking if TimerExists in timer_indicator, but it always comes up false. weird logic here.
 //implement UNITS setting, //make units value work properly.
 //replace overflow time and invisible timer with switches
-//add better memory management
-//import data to db
 //EXPORT data from db to calendar
-//chime on start/end of event
 //function in background
-//widget-icon overlay thing from the top for notifications.
+
+//fresh todo for may10:
+//widget-icon overlay thing from the top for notifications. 
+//pull events from db into calendar.
+//add way to delete calendar event
+//(on long press, open form for want to delete $event name? yes? no?, then remove from db and update parent widget)
+//hide semicircle when calendar isn't running
+//update buttons in with switches in settings and BottomNavigationBar for menu/returns.
 //
+
 
 import 'dart:async';
 import 'dart:io';

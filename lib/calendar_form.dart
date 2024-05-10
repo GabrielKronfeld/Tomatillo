@@ -23,6 +23,8 @@ import 'package:sqflite/sqflite.dart';
 
 //TODO move the cupertinoButtons into a new widget for cleanliness
 // ^ or change the style of buttons etc to make it look nicer. later.
+//TODO give UID based on previous UID in db? this would be done by finding the greatest UID , and +1ing that,
+//I guess we kind of already do that with the method we use NOW, what with the sharedprefs tracking it, keeping it O(1)
 class EventForm extends StatefulWidget {
   final Function() notifyParent;
   // ignore: prefer_const_constructors_in_immutables
@@ -237,7 +239,8 @@ class _EventFormState extends State<EventForm> {
                       widget.notifyParent();
                       //not SUPER sure about mounted, but it gets rid
                       //of the linter, I guess !mounted when still waiting for async data?
-                      if(mounted){
+                      //re: mounted docs on flutter.dev
+                      if(context.mounted){
                         Navigator.of(context).pop();
                       }
                     },

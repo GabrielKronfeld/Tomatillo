@@ -3,6 +3,9 @@ import 'main.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 
 class TimerIndicator extends StatefulWidget {
+  //TODO: call parent class to refresh so we can have the timer be invisible until the timer starts, so we get 
+  //rid of that super weird looking 2/3 circle.
+  //how to? re: calendar_form/calendar-page
 
  
   int totalTimeinSeconds=1;//as seconds
