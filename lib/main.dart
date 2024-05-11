@@ -25,6 +25,7 @@
 //DONE import data to db
 //DONE??add better memory management
 //kind of a passive/persistent thing right?
+//DONE make timer invisible when there is no timer running.
 
 //TODO:
 //make more elegant method to keep track of time. in what way? for the timer function? yeah.
@@ -32,12 +33,10 @@
 //Add a dark mode!!
 //classic pomodoro button
 //add a way to add minutes without needing to tap 60 times.
-//make timer invisible when there is no timer running.
-///Tried above by checking if TimerExists in timer_indicator, but it always comes up false. weird logic here.
 //implement UNITS setting, //make units value work properly.
 //replace overflow time and invisible timer with switches
 //EXPORT data from db to calendar
-//function in background
+//make app be able to operate in background
 
 //fresh todo for may10:
 //widget-icon overlay thing from the top for notifications. 
@@ -252,7 +251,9 @@ class MyHomePageState extends State<MyHomePage> {
   //using recursion to sort this shit out. garbage code. very bad. D--
   _startTimer(timeToRun, cycles) {
     //once every second, decrease the time by a second (duh)
-    timerExists = true;
+    setState(() {
+      timerExists = true;
+    });
     mainTimerCount =
         timeToRun + (mainVars['Overflow Time'] ? timeRemaining : 0);
     totalTimeForCycleinSeconds = mainTimerCount;
@@ -444,10 +445,15 @@ class MyHomePageState extends State<MyHomePage> {
                     tempDidWeFinish,
                   ),
                 ),
+                timerExists?
                 TimerIndicator(
                   totalTimeinSeconds: totalTimeForCycleinSeconds,
                   minutes: minutes,
                   seconds: seconds,
+                ):Container(
+                  color: Colors.blue,
+                  width: 50,
+                  height: 50
                 ),
                 Padding(padding: EdgeInsetsDirectional.symmetric()),
                 Text(
