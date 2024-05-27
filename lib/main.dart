@@ -26,6 +26,11 @@
 //DONE??add better memory management
 //kind of a passive/persistent thing right?
 //DONE make timer invisible when there is no timer running.
+//DONE find out why the color seed isn't loaded properly <-- should be because V V V
+//        //colorscheme isn't updating the proper color from the seed color.
+//REFERENCE ORIGINAL THEME.of(context).* not context).colorscheme.* FOR THE DEEPER SHADES
+
+//DONE replace overflow time and invisible timer with switches
 
 //TODO:
 //make more elegant method to keep track of time. in what way? for the timer function? yeah.
@@ -34,19 +39,16 @@
 //classic pomodoro button
 //add a way to add minutes without needing to tap 60 times.
 //implement UNITS setting, //make units value work properly.
-//replace overflow time and invisible timer with switches
 //EXPORT data from db to calendar
 //make app be able to operate in background
 
-//fresh todo for may10:
-//widget-icon overlay thing from the top for notifications. 
+//fresh todo for may10: lmao it's been almost 2 weeks...
+//widget-icon overlay thing from the top for notifications.
 //pull events from db into calendar.
 //add way to delete calendar event
 //(on long press, open form for want to delete $event name? yes? no?, then remove from db and update parent widget)
 //hide semicircle when calendar isn't running
-//update buttons in with switches in settings and BottomNavigationBar for menu/returns.
-//
-
+//update buttons in with switches in settings and NavigationBar for menu/returns.
 
 import 'dart:async';
 import 'dart:io';
@@ -120,6 +122,8 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           useMaterial3: true,
           colorScheme:
+              //colorscheme isn't updating the proper color from the seed color.
+              //REFERENCE ORIGINAL THEME.of(context).* not context).colorscheme.* FOR THE DEEPER SHADES
               ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 25, 68, 26)),
         ),
         home: const MyHomePage(title: 'Tomatillo\n🐸🍅🐸🍅🐸🍅🐸'),
@@ -163,11 +167,11 @@ class MyHomePageState extends State<MyHomePage> {
     'Work Time': 10, //total time for work session
     'Break Time': 5, //total time for break session
     'Total Cycles': 3, //total work/break cycles to run
-    'CalendarEntries': 0, //how many entries ever made for Calendar. Used for UID in db.
+    'CalendarEntries':
+        0, //how many entries ever made for Calendar. Used for UID in db.
     'Overflow Time': true,
     'Invisible Timer': false,
     'Units': 'seconds',
-
   };
 
 //next we want to put these into persistent memory
@@ -193,7 +197,7 @@ class MyHomePageState extends State<MyHomePage> {
       prefs.getInt('Total Cycles') == null
           ? (prefs.setInt('Total Cycles', mainVars['Total Cycles']))
           : (mainVars['Total Cycles'] = prefs.getInt('Total Cycles'));
-                
+
       prefs.getInt('CalendarEntries') == null
           ? (prefs.setInt('CalendarEntries', mainVars['CalendarEntries']))
           : (mainVars['CalendarEntries'] = prefs.getInt('CalendarEntries'));
@@ -405,6 +409,7 @@ class MyHomePageState extends State<MyHomePage> {
     // than having to individually change instances of widgets.
     int minutes = (mainTimerCount / 60).floor();
     int seconds = mainTimerCount % 60;
+    int currentIndex = 1;
     Widget beginOrAlterSession = breakOrAlterSession(onBreak);
 
     return Scaffold(
@@ -414,6 +419,38 @@ class MyHomePageState extends State<MyHomePage> {
         centerTitle: true,
         title: Text(widget.title),
         backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+      ),
+      //when we finish the nagivation bar migration,
+      //done turn the approipriate buttons in Settings to switches
+      //THEN, we finish the async nonsense for the calendar data import
+      //finally we make sure the calendar timer stuff is appropriate
+      //and then I think we're just about ready to publish?
+      //add a (1-hour pomodoro auto-button in home screen?)
+      //AND MAKE SURE IT RUNS WHEN THE SCREEN IS OFF!!
+      bottomNavigationBar: NavigationBar(
+        backgroundColor: Theme.of(context)
+            .colorScheme
+            .primaryContainer, //not updating color properly?? idk why.
+        selectedIndex: currentIndex,
+        destinations: [
+          NavigationDestination(
+              icon: Icon(Icons.calendar_month), label: "Schedule"),
+          NavigationDestination(icon: Icon(Icons.timelapse), label: "Home"),
+          NavigationDestination(icon: Icon(Icons.settings), label: "Settings"),
+        ],
+        onDestinationSelected: (int index) {
+          setState(() {
+            currentIndex = index;
+            print('index:$index');
+            //this WORKS but it's not what we want to have happen
+            if (index == 2) {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const MySettingsPage()));
+            }
+          });
+        },
       ),
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
@@ -445,16 +482,13 @@ class MyHomePageState extends State<MyHomePage> {
                     tempDidWeFinish,
                   ),
                 ),
-                timerExists?
-                TimerIndicator(
-                  totalTimeinSeconds: totalTimeForCycleinSeconds,
-                  minutes: minutes,
-                  seconds: seconds,
-                ):Container(
-                  color: Colors.blue,
-                  width: 50,
-                  height: 50
-                ),
+                timerExists
+                    ? TimerIndicator(
+                        totalTimeinSeconds: totalTimeForCycleinSeconds,
+                        minutes: minutes,
+                        seconds: seconds,
+                      )
+                    : Container(color: Colors.blue, width: 50, height: 50),
                 Padding(padding: EdgeInsetsDirectional.symmetric()),
                 Text(
                   'breaks remaining: $cyclesRemaining',
@@ -532,6 +566,7 @@ class MyHomePageState extends State<MyHomePage> {
           ),
         ),
       ),
+//todo: update color, update links to send to the right pages, upage index etc etc.
     );
   }
 }

@@ -3,6 +3,8 @@ import 'main.dart';
 import 'package:flutter/material.dart';
 import 'package:time_planner/time_planner.dart';
 import 'calendar_form.dart';
+import 'database.dart';
+import 'tptask.dart';
 
 //DONE Add a way to add events
 //DONE pop-out widget, with a toggle for one-time/repeating event.
@@ -32,10 +34,53 @@ class MyCalendarPage extends StatefulWidget {
 }
 
 class MyCalendarPageState extends State<MyCalendarPage> {
+  late Future<List<TPTask>> futureTasksList;
+
+  @override
+  void initState() {
+    super.initState();
+    futureTasksList = TPTasks(openDB());
+  }
+
   //update CalendarPage state when child widget passes new data
   refresh() {
-  setState(() {});
-}
+    setState(() {});
+  }
+
+// List<TimePlannerTask> getTasksList() {
+//   //list of all database tasks
+//   List<TimePlannerTask> templist=[];
+//   //remove the as List, and then rebuild with a futureBuilder.
+//   for (var i in tasks as List<TPTask>){
+//     templist.add(
+//       TimePlannerTask(
+//         // background color for task
+//         color: Theme.of(context).cardColor,
+//         // day: Index of header, hour: Task will be begin at this hour
+//         // minutes: Task will be begin at this minutes
+//         dateTime: TimePlannerDateTime(
+//             day: i.dateTime.day,
+//             hour: i.dateTime.hour,
+//             minutes: i.dateTime.minutes),
+//         // Minutes duration of task
+//         minutesDuration: i.minutesDuration,
+
+//         // Days duration of task (use for multi days task)
+//         daysDuration: 1,
+//         onTap: () {
+//           setState(() {});
+//         },
+//         child: Text(
+//           i.title,
+//           style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 12),
+//         ),
+//       )
+//     );
+//   }
+//   return templist;
+
+// }
+
   @override
   Widget build(BuildContext context) {
     ColorScheme theme = Theme.of(context).colorScheme;
@@ -50,7 +95,7 @@ class MyCalendarPageState extends State<MyCalendarPage> {
       dividerColor: theme.background,
       //horizontalTaskPadding: 8.0,
     );
-    var textforTask= 'this is a task';
+    var textforTask = 'this is a task';
     //update the list of tasks based on the database.
     List<TimePlannerTask> tasks = [
       TimePlannerTask(
@@ -76,8 +121,8 @@ class MyCalendarPageState extends State<MyCalendarPage> {
         ),
       ),
     ];
-
-   return Scaffold(
+    // tasks.addAll(getTasksList());
+    return Scaffold(
       floatingActionButton: FloatingActionButton(
         backgroundColor: Theme.of(context).cardColor,
         focusColor: Theme.of(context).cardColor,
@@ -88,7 +133,7 @@ class MyCalendarPageState extends State<MyCalendarPage> {
               builder: (context) => AlertDialog(
                     content: Stack(
                       clipBehavior: Clip.none,
-                      children:  <Widget>[
+                      children: <Widget>[
                         EventForm(notifyParent: refresh),
                       ],
                     ),
@@ -108,7 +153,6 @@ class MyCalendarPageState extends State<MyCalendarPage> {
                 },
                 child: const Text('return to home yippeeee'),
               ),
-             
             ),
             Text(MyCalendarPage.sampletext),
             Expanded(
@@ -153,6 +197,57 @@ class MyCalendarPageState extends State<MyCalendarPage> {
                 tasks: tasks,
               ),
             ),
+            Expanded(
+                child: FutureBuilder<List<TPTask>>(
+              future: futureTasksList,
+              builder:
+                  (BuildContext context, AsyncSnapshot<List<TPTask>> snapshot) {
+                List<Widget> children;
+                if (snapshot.hasData) {
+                  children = <Widget>[
+                    const Icon(
+                      Icons.check_circle_outline,
+                      color: Colors.green,
+                      size: 60,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 16),
+                      child: Text('Result: ${snapshot.data}'),
+                    ),
+                  ];
+                } else if (snapshot.hasError) {
+                  children = <Widget>[
+                    const Icon(
+                      Icons.error_outline,
+                      color: Colors.red,
+                      size: 60,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 16),
+                      child: Text('Error: ${snapshot.error}'),
+                    ),
+                  ];
+                } else {
+                  children = const <Widget>[
+                    SizedBox(
+                      width: 60,
+                      height: 60,
+                      child: CircularProgressIndicator(),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 16),
+                      child: Text('Awaiting result...'),
+                    ),
+                  ];
+                }
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: children,
+                  ),
+                );
+              },
+            ))
           ],
         ),
       ),
