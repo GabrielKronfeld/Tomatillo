@@ -46,40 +46,40 @@ class MyCalendarPageState extends State<MyCalendarPage> {
   refresh() {
     setState(() {});
   }
+//takes a list of TPTask (MUST BE [TPTask,...] list of TPTask objects!)
+List<TimePlannerTask> getTasksList(tasks) {
+  //list of all database tasks
+  List<TimePlannerTask> templist=[];
+  //remove the as List, and then rebuild with a futureBuilder.
+  for (var i in tasks as List<TPTask>){
+    templist.add(
+      TimePlannerTask(
+        // background color for task
+        color: Theme.of(context).cardColor,
+        // day: Index of header, hour: Task will be begin at this hour
+        // minutes: Task will be begin at this minutes
+        dateTime: TimePlannerDateTime(
+            day: i.dateTime.day,
+            hour: i.dateTime.hour,
+            minutes: i.dateTime.minutes),
+        // Minutes duration of task
+        minutesDuration: i.minutesDuration,
 
-// List<TimePlannerTask> getTasksList() {
-//   //list of all database tasks
-//   List<TimePlannerTask> templist=[];
-//   //remove the as List, and then rebuild with a futureBuilder.
-//   for (var i in tasks as List<TPTask>){
-//     templist.add(
-//       TimePlannerTask(
-//         // background color for task
-//         color: Theme.of(context).cardColor,
-//         // day: Index of header, hour: Task will be begin at this hour
-//         // minutes: Task will be begin at this minutes
-//         dateTime: TimePlannerDateTime(
-//             day: i.dateTime.day,
-//             hour: i.dateTime.hour,
-//             minutes: i.dateTime.minutes),
-//         // Minutes duration of task
-//         minutesDuration: i.minutesDuration,
+        // Days duration of task (use for multi days task)
+        daysDuration: 1,
+        onTap: () {
+          setState(() {});
+        },
+        child: Text(
+          i.title,
+          style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 12),
+        ),
+      )
+    );
+  }
+  return templist;
 
-//         // Days duration of task (use for multi days task)
-//         daysDuration: 1,
-//         onTap: () {
-//           setState(() {});
-//         },
-//         child: Text(
-//           i.title,
-//           style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 12),
-//         ),
-//       )
-//     );
-//   }
-//   return templist;
-
-// }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -98,28 +98,29 @@ class MyCalendarPageState extends State<MyCalendarPage> {
     var textforTask = 'this is a task';
     //update the list of tasks based on the database.
     List<TimePlannerTask> tasks = [
-      TimePlannerTask(
-        // background color for task
-        color: Theme.of(context).cardColor,
-        // day: Index of header, hour: Task will be begin at this hour
-        // minutes: Task will be begin at this minutes
-        dateTime: TimePlannerDateTime(
-            day: 1,
-            hour: widget.timeofDay.hour,
-            minutes: widget.timeofDay.minute),
-        // Minutes duration of task
-        minutesDuration: 190,
+      //start with an empty task list
+      // TimePlannerTask(
+      //   // background color for task
+      //   color: Theme.of(context).cardColor,
+      //   // day: Index of header, hour: Task will be begin at this hour
+      //   // minutes: Task will be begin at this minutes
+      //   dateTime: TimePlannerDateTime(
+      //       day: 1,
+      //       hour: widget.timeofDay.hour,
+      //       minutes: widget.timeofDay.minute),
+      //   // Minutes duration of task
+      //   minutesDuration: 190,
 
-        // Days duration of task (use for multi days task)
-        daysDuration: 1,
-        onTap: () {
-          setState(() {});
-        },
-        child: Text(
-          textforTask,
-          style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 12),
-        ),
-      ),
+      //   // Days duration of task (use for multi days task)
+      //   daysDuration: 1,
+      //   onTap: () {
+      //     setState(() {});
+      //   },
+      //   child: Text(
+      //     textforTask,
+      //     style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 12),
+      //   ),
+      // ),
     ];
     // tasks.addAll(getTasksList());
     return Scaffold(
@@ -156,63 +157,60 @@ class MyCalendarPageState extends State<MyCalendarPage> {
             ),
             Text(MyCalendarPage.sampletext),
             Expanded(
-              child: TimePlanner(
-                style: style,
-                // time will be start at this hour on table
-                startHour: 6,
-                // time will be end at this hour on table
-                endHour: 23,
-                setTimeOnAxis: false,
-
-                // each header is a column and a day
-                headers: const [
-                  TimePlannerTitle(
-                    date: "3/10/2021",
-                    title: "Sunday",
-                  ),
-                  TimePlannerTitle(
-                    date: "3/2024",
-                    title: "Monday",
-                  ),
-                  TimePlannerTitle(
-                    date: "3/12/2021",
-                    title: "Tuesday",
-                  ),
-                  TimePlannerTitle(
-                    date: "3/10/2021",
-                    title: "Wednesday",
-                  ),
-                  TimePlannerTitle(
-                    date: "3/11/2021",
-                    title: "Thursday",
-                  ),
-                  TimePlannerTitle(
-                    date: "3/12/2021",
-                    title: "Friday",
-                  ),
-                  TimePlannerTitle(date: "", title: "Saturday"),
-                ],
-
-                // List of task will be show on the time planner
-                tasks: tasks,
-              ),
-            ),
-            Expanded(
                 child: FutureBuilder<List<TPTask>>(
               future: futureTasksList,
               builder:
                   (BuildContext context, AsyncSnapshot<List<TPTask>> snapshot) {
                 List<Widget> children;
+             //   print(futureTasksList);
+                //print(snapshot);
+                //print(snapshot.data);
                 if (snapshot.hasData) {
+                 // print(snapshot.data);
+                  tasks.addAll(getTasksList(snapshot.data));
                   children = <Widget>[
-                    const Icon(
-                      Icons.check_circle_outline,
-                      color: Colors.green,
-                      size: 60,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 16),
-                      child: Text('Result: ${snapshot.data}'),
+                    Expanded(
+                      child: TimePlanner(
+                        style: style,
+                        // time will be start at this hour on table
+                        startHour: 6,
+                        // time will be end at this hour on table
+                        endHour: 23,
+                        setTimeOnAxis: false,
+
+                        // each header is a column and a day
+                        headers: const [
+                          TimePlannerTitle(
+                            date: "3/10/2021",
+                            title: "Sunday",
+                          ),
+                          TimePlannerTitle(
+                            date: "3/2024",
+                            title: "Monday",
+                          ),
+                          TimePlannerTitle(
+                            date: "3/12/2021",
+                            title: "Tuesday",
+                          ),
+                          TimePlannerTitle(
+                            date: "3/10/2021",
+                            title: "Wednesday",
+                          ),
+                          TimePlannerTitle(
+                            date: "3/11/2021",
+                            title: "Thursday",
+                          ),
+                          TimePlannerTitle(
+                            date: "3/12/2021",
+                            title: "Friday",
+                          ),
+                          TimePlannerTitle(date: "", title: "Saturday"),
+                        ],
+
+                        // List of task will be show on the time planner
+                        
+                        tasks: tasks,
+                      ),
                     ),
                   ];
                 } else if (snapshot.hasError) {

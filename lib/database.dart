@@ -51,6 +51,7 @@ Future<List<TPTask>> TPTasks(Future<Database> database) async {
   for (var i = 0; i < TPTaskMaps.length; i++) {
     print('TPTaskMaps[i]: ${TPTaskMaps[i]}');
     //ALL are dateTimeDay here. not great....
+    //idk what^ means, but I have a -1 in dateTimeDay... need to verify how that happens...
     TPTaskList.add(
       TPTask(
         id: TPTaskMaps[i]['id'] as int,

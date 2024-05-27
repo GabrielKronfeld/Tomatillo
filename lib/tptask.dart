@@ -26,6 +26,10 @@ class TPTask extends TimePlannerTask{
 //return a map mapping 1:1 DIRECTLY to the database table columns!
 // ^^^VERY IMPORTANT!!!!
 Map<String, Object> toMap(){
+  //we'll need to sanitize all sorts of things over time.
+  if(dateTime.day<0|| dateTime.day>6){
+    throw RangeError("Datetime $DateTime is out of bounds with DateTime.day being $DateTime.day");
+  }
   return{
     'id': id,
     'title': title,
@@ -43,14 +47,13 @@ Map<String, Object> toMap(){
   //this brings an error, likely a bug in dart though.
   //unnecessary, but helps us visualize data. specifically when printing the list of Dog, vs printing the list of <String,Object?> of the raw db.
   //   String toString() {
-  //   return '''Dog{
-  //     id: $id, 
-  //     title: $title, 
-  //     minutesDuration: $minutesDuration,
-  //     dateTimeDay: $dateTime.day
-  //     dateTimeHour: $dateTime.hour,
-  //     dateTimeMinutes: $dateTime.minutes,
-  //     color:$color,
+  //   return '''TPTask{
+  //     key: $key,
+  //   id: $id,
+  //   title: $title,
+  //   oneTimeEvent: $oneTimeEvent,
+  //   minutesDuration: $minutesDuration,
+  //   dateTime: $dateTime,
   //   }''';
   // }
 
