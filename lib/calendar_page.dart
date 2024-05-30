@@ -5,6 +5,7 @@ import 'package:time_planner/time_planner.dart';
 import 'calendar_form.dart';
 import 'database.dart';
 import 'tptask.dart';
+import 'calendar_modify_form.dart';
 
 //DONE Add a way to add events
 //DONE pop-out widget, with a toggle for one-time/repeating event.
@@ -67,8 +68,17 @@ List<TimePlannerTask> getTasksList(tasks) {
 
         // Days duration of task (use for multi days task)
         daysDuration: 1,
-        onTap: () {
-          setState(() {});
+        onTap: () async{
+          await showDialog<void>(
+              context: context,
+              builder: (context) => AlertDialog(
+                    content: Stack(
+                      clipBehavior: Clip.none,
+                      children: <Widget>[
+                        ModifyEventForm(notifyParent: refresh, id: i.id)
+                      ],
+                    ),
+                  ));;
         },
         child: Text(
           i.title,
@@ -162,18 +172,14 @@ List<TimePlannerTask> getTasksList(tasks) {
               builder:
                   (BuildContext context, AsyncSnapshot<List<TPTask>> snapshot) {
                 List<Widget> children;
-             //   print(futureTasksList);
-                //print(snapshot);
-                //print(snapshot.data);
                 if (snapshot.hasData) {
-                 // print(snapshot.data);
                   tasks.addAll(getTasksList(snapshot.data));
                   children = <Widget>[
                     Expanded(
                       child: TimePlanner(
                         style: style,
                         // time will be start at this hour on table
-                        startHour: 6,
+                        startHour: 1,
                         // time will be end at this hour on table
                         endHour: 23,
                         setTimeOnAxis: false,

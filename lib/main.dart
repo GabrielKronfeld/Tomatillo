@@ -32,6 +32,11 @@
 
 //DONE replace overflow time and invisible timer with switches
 
+//DONE pull events from db into calendar.
+
+//DONE EXPORT data from db to calendar
+//DONE hide semicircle when calendar isn't running
+
 //TODO:
 //make more elegant method to keep track of time. in what way? for the timer function? yeah.
 //fix start break early button
@@ -39,21 +44,19 @@
 //classic pomodoro button
 //add a way to add minutes without needing to tap 60 times.
 //implement UNITS setting, //make units value work properly.
-//EXPORT data from db to calendar
 //make app be able to operate in background
 
 //fresh todo for may10: lmao it's been almost 2 weeks...
 //widget-icon overlay thing from the top for notifications.
-//pull events from db into calendar.
 //add way to delete calendar event
 //(on long press, open form for want to delete $event name? yes? no?, then remove from db and update parent widget)
-//hide semicircle when calendar isn't running
 //update buttons in with switches in settings and NavigationBar for menu/returns.
 
 import 'dart:async';
 import 'dart:io';
 import 'dart:core';
 import 'package:flutter/material.dart';
+import 'package:tomatillo_flutter/main_page.dart';
 import 'settings_page.dart';
 import 'calendar_page.dart';
 import 'calendar_page2.dart';
@@ -420,20 +423,13 @@ class MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
         backgroundColor: Theme.of(context).colorScheme.primaryContainer,
       ),
-      //when we finish the nagivation bar migration,
-      //done turn the approipriate buttons in Settings to switches
-      //THEN, we finish the async nonsense for the calendar data import
-      //finally we make sure the calendar timer stuff is appropriate
-      //and then I think we're just about ready to publish?
-      //add a (1-hour pomodoro auto-button in home screen?)
-      //AND MAKE SURE IT RUNS WHEN THE SCREEN IS OFF!!
       bottomNavigationBar: NavigationBar(
         backgroundColor: Theme.of(context)
             .colorScheme
             .primaryContainer, //not updating color properly?? idk why.
         selectedIndex: currentIndex,
-        destinations: [
-          NavigationDestination(
+        destinations: const [
+         NavigationDestination(
               icon: Icon(Icons.calendar_month), label: "Schedule"),
           NavigationDestination(icon: Icon(Icons.timelapse), label: "Home"),
           NavigationDestination(icon: Icon(Icons.settings), label: "Settings"),
@@ -441,132 +437,17 @@ class MyHomePageState extends State<MyHomePage> {
         onDestinationSelected: (int index) {
           setState(() {
             currentIndex = index;
-            print('index:$index');
+            print('index:$currentIndex');
             //this WORKS but it's not what we want to have happen
-            if (index == 2) {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const MySettingsPage()));
-            }
           });
         },
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: SizedBox.expand(
-          child: Container(
-            color: Theme.of(context).colorScheme.primaryContainer,
-            child: Column(
-              // Column is also a layout widget. It takes a list of children and
-              // arranges them vertically. By default, it sizes itself to fit its
-              // children horizontally, and tries to be as tall as its parent.
-              //
-              // Invoke "debug painting" (press "p" in the console, choose the
-              // "Toggle Debug Paint" action from the Flutter Inspector in Android
-              // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-              // to see the wireframe for each widget.
-              //
-              // Column has various properties to control how it sizes itself and
-              // how it positions its children. Here we use mainAxisAlignment to
-              // center the children vertically; the main axis here is the vertical
-              // axis because Columns are vertical (the cross axis would be
-              // horizontal).
+      body: <Widget>[
 
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.all(50.0),
-                  child: Text(
-                    tempDidWeFinish,
-                  ),
-                ),
-                timerExists
-                    ? TimerIndicator(
-                        totalTimeinSeconds: totalTimeForCycleinSeconds,
-                        minutes: minutes,
-                        seconds: seconds,
-                      )
-                    : Container(color: Colors.blue, width: 50, height: 50),
-                Padding(padding: EdgeInsetsDirectional.symmetric()),
-                Text(
-                  'breaks remaining: $cyclesRemaining',
-                  style: Theme.of(context).textTheme.labelSmall,
-                ),
-                const Padding(padding: EdgeInsets.fromLTRB(0, 0, 0, 20.0)),
-                beginOrAlterSession,
-                const Padding(padding: EdgeInsets.all(30)),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // row of buttons for the main page
-                    ElevatedButton.icon(
-                      //this brings us to the calendar page
-                      onPressed: () {
-                        //navigate to Calendar Page
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => MyCalendarPage()));
-                      },
-                      icon: const Icon(Icons.calendar_month),
-
-                      //add padding here, and later remove the + button for a nav bar at the bottom
-                      label: const Text("Calendar"),
-                    ),
-                    const Padding(padding: EdgeInsets.all(8)),
-
-                    ElevatedButton.icon(
-                      //this brings us to the calendar page
-                      onPressed: () {
-                        //navigate to Calendar Page
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const MyCalendarPage2()));
-                      },
-                      icon: const Icon(Icons.calendar_today),
-
-                      //add padding here, and later remove the + button for a nav bar at the bottom
-                      label: const Text("Calendar"),
-                    ),
-                    const Padding(padding: EdgeInsets.all(8)),
-
-                    ElevatedButton.icon(
-                      onPressed: () {
-                        //navigate to Setting Page
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const MySettingsPage()));
-                      },
-                      icon: const Icon(Icons.settings),
-
-                      //add padding here, and later remove the + button for a nav bar at the bottom
-                      label: const Text("Settings"),
-                    ),
-                    /*ElevatedButton.icon(
-                      onPressed: () {
-                        //navigate to Setting Page
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const MyWidget()));
-                      },
-                      icon: const Icon(Icons.settings),
-
-                      //add padding here, and later remove the + button for a nav bar at the bottom
-                      label: const Text("color"),
-                    ),*/
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-//todo: update color, update links to send to the right pages, upage index etc etc.
-    );
+        MyCalendarPage(),
+        MyMainPage(),
+        MySettingsPage(),
+      ][currentIndex],
+      );
   }
 }
