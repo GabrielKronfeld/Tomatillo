@@ -48,6 +48,7 @@ class MyCalendarPageState extends State<MyCalendarPage> {
     setState(() {});
   }
 //takes a list of TPTask (MUST BE [TPTask,...] list of TPTask objects!)
+//returns a list of TimePlannerTask objs
 List<TimePlannerTask> getTasksList(tasks) {
   //list of all database tasks
   List<TimePlannerTask> templist=[];
@@ -65,7 +66,6 @@ List<TimePlannerTask> getTasksList(tasks) {
             minutes: i.dateTime.minutes),
         // Minutes duration of task
         minutesDuration: i.minutesDuration,
-
         // Days duration of task (use for multi days task)
         daysDuration: 1,
         onTap: () async{
@@ -75,7 +75,7 @@ List<TimePlannerTask> getTasksList(tasks) {
                     content: Stack(
                       clipBehavior: Clip.none,
                       children: <Widget>[
-                        ModifyEventForm(notifyParent: refresh, id: i.id)
+                        ModifyEventForm(notifyParent: refresh, id: i.id, title: i.title)
                       ],
                     ),
                   ));;
@@ -93,6 +93,7 @@ List<TimePlannerTask> getTasksList(tasks) {
 
   @override
   Widget build(BuildContext context) {
+
     ColorScheme theme = Theme.of(context).colorScheme;
 
     Color bgColor = Theme.of(context).colorScheme.primaryContainer;

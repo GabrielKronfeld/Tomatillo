@@ -28,7 +28,7 @@ class TPTask extends TimePlannerTask{
 Map<String, Object> toMap(){
   //we'll need to sanitize all sorts of things over time.
   if(dateTime.day<0|| dateTime.day>6){
-    throw RangeError("Datetime $DateTime is out of bounds with DateTime.day being $DateTime.day");
+    throw RangeError("Datetime ${dateTime} is out of bounds with DateTime.day being ${dateTime.day}");
   }
   return{
     'id': id,

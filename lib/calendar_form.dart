@@ -1,5 +1,6 @@
 import 'dart:core';
 import 'dart:ffi';
+import 'package:calendar_view/calendar_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -9,11 +10,9 @@ import 'package:tomatillo_flutter/database.dart';
 import 'package:tomatillo_flutter/tptask.dart';
 import 'main.dart';
 import 'settings_page.dart';
-
 import 'package:flutter/widgets.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
-
 
 //When you save, post all the data to a sqlite db.
 //make a new timed-event object, near-identical to the timer_indicator. separate file.
@@ -27,26 +26,28 @@ import 'package:sqflite/sqflite.dart';
 //I guess we kind of already do that with the method we use NOW, what with the sharedprefs tracking it, keeping it O(1)
 class EventForm extends StatefulWidget {
   final Function() notifyParent;
+  var modifiedID;
   // ignore: prefer_const_constructors_in_immutables
-  EventForm({super.key, required this.notifyParent});
+  EventForm({super.key, required this.notifyParent, this.modifiedID});
 
   @override
   State<EventForm> createState() => _EventFormState();
 }
 
 class _EventFormState extends State<EventForm> {
-
   @override
   void initState() {
     super.initState();
     database = openDB();
   }
 
-  var database;
+  late Future<Database> database;
   String title = "";
-  String Day = "";
-  DateTime startTime = DateTime.now();
-  DateTime duration = DateTime.now();
+  String day = "";
+  TimeOfDay startTime = TimeOfDay.now();
+  //will need to move to TimeoFDay when leaving cupertino
+  TimeOfDay duration = const TimeOfDay(hour: 1, minute: 0);
+
   bool oneTimeEventBool = false;
   List<String> days = [
     'Sunday',
@@ -61,6 +62,7 @@ class _EventFormState extends State<EventForm> {
   final _formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
+    print('duration ${startTime}');
     return Form(
       //Title, Day, Time (when to when), Color
       key: _formKey,
@@ -78,6 +80,7 @@ class _EventFormState extends State<EventForm> {
             Padding(
               padding: const EdgeInsets.all(8),
               child: DropdownMenu<String>(
+                initialSelection: days[DateTime.now().weekday],
                 //we use the map function to iterate over the days list, and for each value
                 //(we call the iterated value "day", we assign it to value and label in
                 //a new DropdownMenuEntry object, and then push that object to a new list)
@@ -87,88 +90,47 @@ class _EventFormState extends State<EventForm> {
                     .toList(),
                 onSelected: (value) {
                   //NOTE! Possibly causing a bug here. will need an error catch for null value either here or at the end.
-                  Day=value!;
+                  day = value!;
                   print('value$value');
                 },
               ),
             ),
-            Row(
-              //should separate the CupertinoButton into a separate widget since you call it twice almost identically.
-              //TODO later, little tired.
-              children: [
-                //cupertinoButton to add way to change time for value saved in tiems
-                CupertinoButton(
-                  child: Text('Start Time'),
-                  onPressed: () => showCupertinoModalPopup<void>(
+            TextButton(
+                child: Text(
+                    'Start Time: ${startTime.hour} : ${startTime.minute} '),
+                onPressed: () async {
+                  final TimeOfDay? starttime = await showTimePicker(
                     context: context,
-                    builder: (BuildContext context) => Container(
-                      height: 216,
-                      padding: const EdgeInsets.only(top: 6.0),
-                      // The Bottom margin is provided to align the popup above the system
-                      // navigation bar.
-                      margin: EdgeInsets.only(
-                        bottom: MediaQuery.of(context).viewInsets.bottom,
-                      ),
-                      // Provide a background color for the popup.
-                      color:
-                          CupertinoColors.systemBackground.resolveFrom(context),
-                      // Use a SafeArea widget to avoid system overlaps.
-                      child: SafeArea(
-                        top: false,
-                        child: CupertinoDatePicker(
-                          initialDateTime: DateTime.now(),
-                          mode: CupertinoDatePickerMode.time,
-                          use24hFormat: true,
-                          // This is called when the user changes the time.
-                          onDateTimeChanged: (DateTime newTime) {
-                            //does this not work properly? or does it?
-                            setState(() => startTime = newTime);
-                          },
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                Text('${startTime.hour}:${startTime.minute}'),
-              ],
-            ),
-            Row(
-              children: [
-                //cupertinoButton to add way to change time for value saved in tiems
-                CupertinoButton(
-                  child: Text('Duration'),
-                  onPressed: () => showCupertinoModalPopup<void>(
+                    initialTime: TimeOfDay.now(),
+                  );
+                  setState(() {
+                    startTime = starttime ?? TimeOfDay.now();
+                  });
+                  
+                  print(startTime);
+                }),
+            TextButton(
+                child: Text(
+                    'Duration: ${duration.hour} hours ${duration.minute} minutes'),
+                onPressed: () async {
+                  final TimeOfDay? tempduration = await showTimePicker(
                     context: context,
-                    builder: (BuildContext context) => Container(
-                      height: 216,
-                      padding: const EdgeInsets.only(top: 6.0),
-                      // The Bottom margin is provided to align the popup above the system
-                      // navigation bar.
-                      margin: EdgeInsets.only(
-                        bottom: MediaQuery.of(context).viewInsets.bottom,
-                      ),
-                      // Provide a background color for the popup.
-                      color:
-                          CupertinoColors.systemBackground.resolveFrom(context),
-                      // Use a SafeArea widget to avoid system overlaps.
-                      child: SafeArea(
-                        top: false,
-                        child: CupertinoDatePicker(
-                          initialDateTime: DateTime.now(),
-                          mode: CupertinoDatePickerMode.time,
-                          use24hFormat: true,
-                          // This is called when the user changes the time.
-                          onDateTimeChanged: (DateTime newTime) {
-                            setState(() => duration = newTime);
-                          },
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                Text('${duration.hour}:${duration.minute}'),
-              ],
-            ),
+                    initialTime: TimeOfDay.now(),
+                    initialEntryMode: TimePickerEntryMode.input,
+                    builder: (BuildContext context, Widget? child) {
+                      return MediaQuery(
+                        data: MediaQuery.of(context)
+                            .copyWith(alwaysUse24HourFormat: true),
+                        child: child!,
+                      );
+                    },
+                  );
+                  setState(() {
+                    duration = tempduration ?? duration;
+                  print(duration);
+                  });
+                  
+                }),
             Row(
               children: [
                 const Text('One-time event?'),
@@ -196,51 +158,76 @@ class _EventFormState extends State<EventForm> {
                     child: const Text('Submit'),
                     onPressed: () async {
                       final prefs = await SharedPreferences.getInstance();
-                      
+
                       if (_formKey.currentState!.validate()) {
-                        
                         print('VALIDATED');
                         print('title$title');
-                        print('Day$Day');
+                        print('Day$day');
                         print('starttime$startTime');
                         print('duration$duration');
                         print('bool$oneTimeEventBool');
-                        print(1==true);
-                        print(0==false);
-                        print(2==true);
-                        print(2==false);
+                        print(1 == true);
+                        print(0 == false);
+                        print(2 == true);
+                        print(2 == false);
                         _formKey.currentState!.save();
+                        if (day == "") {
+                          day = days[DateTime.now().weekday];
+                        }
+                        //if it's a new task
+                        if (widget.modifiedID == null) {
+                          insertTPTask(
+                              //NEED TO ADD THE PROPER DATE TIME DATA!!!
+                              TPTask(
+                                id: await returnIntPref('CalendarEntries'),
+                                title: title,
+                                minutesDuration:
+                                    duration.hour * 60 + duration.minute,
+                                dateTime: TimePlannerDateTime(
+                                    //days.indexOf(Day) theorectically could cause a bug
+                                    day: days.indexOf(day),
+                                    hour: startTime.hour,
+                                    minutes: startTime.minute),
+                                oneTimeEvent: oneTimeEventBool ? 1 : 0,
+                              ),
+                              database);
+                          //increment CalendarEntries
+                          int data = (prefs.getInt('CalendarEntries') ?? 0) + 1;
+                          prefs.setInt('CalendarEntries',
+                              data); //update shared preferences
+                          MyHomePageState.mainVars['CalendarEntries'] =
+                              prefs.getInt(
+                                  'CalendarEntries'); //update mainVars for future
 
-                        insertTPTask(
-                          //NEED TO ADD THE PROPER DATE TIME DATA!!!
-                            TPTask(
-                              id: await returnIntPref('CalendarEntries') ,
-                              title: title,
-                              minutesDuration:
-                                  duration.hour * 60 + duration.minute,
-                              dateTime: TimePlannerDateTime(
-                                //days.indexOf(Day) theorectically could cause a bug
-                                  day: days.indexOf(Day),
-                                  hour: startTime.hour,
-                                  minutes: startTime.minute),
-                              oneTimeEvent: oneTimeEventBool ? 1 : 0,
-                            ),
-                            database);
-                            //increment CalendarEntries
-                            int data = (prefs.getInt('CalendarEntries') ?? 0) + 1;
-                            prefs.setInt('CalendarEntries', data);//update shared preferences
-                            MyHomePageState.mainVars['CalendarEntries']=prefs.getInt('CalendarEntries');//update mainVars for future
-
-                        print(TPTasks(database));
+                          print(TPTasks(database));
+                        }
+                        //we have a modifiedID, passed from modify_form, meaning this is updating a task
+                        else {
+                          updateTPTasks(
+                              //NEED TO ADD THE PROPER DATE TIME DATA!!!
+                              TPTask(
+                                id: widget.modifiedID,
+                                title: title,
+                                minutesDuration:
+                                    duration.hour * 60 + duration.minute,
+                                dateTime: TimePlannerDateTime(
+                                    //days.indexOf(Day) theorectically could cause a bug
+                                    day: days.indexOf(day),
+                                    hour: startTime.hour,
+                                    minutes: startTime.minute),
+                                oneTimeEvent: oneTimeEventBool ? 1 : 0,
+                              ),
+                              database);
+                        }
                       }
                       MyCalendarPage.sampletext = title;
 
-
                       widget.notifyParent();
+                      //^doesn't seem to work though...
                       //not SUPER sure about mounted, but it gets rid
                       //of the linter, I guess !mounted when still waiting for async data?
                       //re: mounted docs on flutter.dev
-                      if(context.mounted){
+                      if (context.mounted) {
                         Navigator.of(context).pop();
                       }
                     },
@@ -254,13 +241,14 @@ class _EventFormState extends State<EventForm> {
     );
   }
 
-//these are unneeded, in future we'll put these in a separate file and 
-/// distribute here and in settings_page too. make the project cleaner.
-  Future<int> returnIntPref(String string) async{
+//these are unneeded, in future we'll put these in a separate file and
+  /// distribute here and in settings_page too. make the project cleaner.
+  Future<int> returnIntPref(String string) async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getInt(string)!;
   }
-  Future<String> returnStrPref(String string) async{
+
+  Future<String> returnStrPref(String string) async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString(string)!;
   }

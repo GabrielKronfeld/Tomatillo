@@ -15,7 +15,6 @@ import 'package:path/path.dart';
 
 //opens the database for use, give it to a variable for fast access when needed.
 Future<Database> openDB() async {
-
   return openDatabase(
     // Set the path to the database. Note: Using the `join` function from the
     // `path` package is best practice to ensure the path is correctly
@@ -76,6 +75,23 @@ return [
         } in TPTaskMaps)
       TPTask(id: id, name: name, age: age),
   ];*/
+}
+
+//returns a single TPTask object, collected from ID.
+Future<TPTask> returnTPTask(Future<Database> database, int id) async {
+  final db = await database;
+  final List<Map<String, Object?>> TPTaskMaps = await db.query('events');
+
+  return TPTask(
+    id: TPTaskMaps[id]['id'] as int,
+    title: TPTaskMaps[id]['title'] as String,
+    minutesDuration: TPTaskMaps[id]['minutesDuration'] as int,
+    oneTimeEvent: TPTaskMaps[id]['oneTimeEvent'] as int,
+    dateTime: TimePlannerDateTime(
+        day: TPTaskMaps[id]['dateTimeDay'] as int,
+        hour: TPTaskMaps[id]['dateTimeHour'] as int,
+        minutes: TPTaskMaps[id]['dateTimeMinutes'] as int),
+  );
 }
 
 //inserts a task into the TPTasks database

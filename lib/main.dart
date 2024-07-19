@@ -37,21 +37,27 @@
 //DONE EXPORT data from db to calendar
 //DONE hide semicircle when calendar isn't running
 
+//DONE add way to delete calendar event
+//DONEreplace form CupertinoButton with TimePicker
+
 //TODO:
+
+    //high priority
+//classic pomodoro button
+//readjust the calendar, currently everything is shifted by an hour. NOT GOOD!!
+//make calendar properly update when we update db, without needing to leave and return to widget.
+//update buttons in with switches in settings and NavigationBar for menu/returns. <----save for later, very important but I'm struggling
+//add a way to add minutes without needing to tap 60 times.
+//implement UNITS setting, //make units value work properly.
+
+    //low priority
 //make more elegant method to keep track of time. in what way? for the timer function? yeah.
 //fix start break early button
 //Add a dark mode!!
-//classic pomodoro button
-//add a way to add minutes without needing to tap 60 times.
-//implement UNITS setting, //make units value work properly.
-//make app be able to operate in background
-
-//fresh todo for may10: lmao it's been almost 2 weeks...
+//make app be able to operate in background\
 //widget-icon overlay thing from the top for notifications.
-//add way to delete calendar event
-//(on long press, open form for want to delete $event name? yes? no?, then remove from db and update parent widget)
-//update buttons in with switches in settings and NavigationBar for menu/returns.
-
+//add a random color to each event, giving it a random HSV of any,0-30,100-75 from HSVColor class
+//add proper dings, not my voice.
 import 'dart:async';
 import 'dart:io';
 import 'dart:core';
@@ -246,175 +252,15 @@ class MyHomePageState extends State<MyHomePage> {
     _loadData();
   }
 
-  //what we do on start. Just so we can add things to the start of the work session if need be.
-  //TIMER EXISTS WHEN WE WANT TO END THE BREAK EARLY! WORK SESSSION DOES NOT GO!
-  _startPomodoro() {
-    if (!timerExists) {
-      tempDidWeFinish = 'onPomodoro!';
-      _startWorkSession(mainVars['Work Time'], mainVars['Total Cycles']);
-    }
-  }
-
-  //using recursion to sort this shit out. garbage code. very bad. D--
-  _startTimer(timeToRun, cycles) {
-    //once every second, decrease the time by a second (duh)
-    setState(() {
-      timerExists = true;
-    });
-    mainTimerCount =
-        timeToRun + (mainVars['Overflow Time'] ? timeRemaining : 0);
-    totalTimeForCycleinSeconds = mainTimerCount;
-    timeRemaining = 0;
-    Timer.periodic(const Duration(seconds: 1), (timer) {
-      print('timer count: $mainTimerCount');
-      setState(() {
-        if (!(mainTimerCount < 1 || setPaused)) {
-          //if we don't have an end condition, tick a second.
-          mainTimerCount--;
-        } else {
-          //all end conditions/swap state logic
-          if (setPaused) {
-            timeRemaining =
-                mainTimerCount; //if we set pause, we add remaining time to next break time
-            //now we have to make sure we go to the break.
-            //we can do onBreak=!onBreak to skip both sides this way. that way
-            //the button becomes less toBREAK and more end-early, saving time.
-            //currently ALWAYS goes to a break and stacks break time. not the worst idea for now.
-            setPaused = false;
-            onBreak = false;
-          }
-          timer.cancel();
-          timerExists = false;
-          print('$cycles, $onBreak,$setPaused ');
-
-          if (forceEnd) {
-            //force end event.
-            forceEnd = false; //maybe this could cause issues? I don't think so.
-            onBreak = false;
-            setPaused = false;
-            cyclesRemaining = 0;
-            timeRemaining = 0;
-            mainTimerCount = 0;
-            tempDidWeFinish = "forced the end!";
-          } else if (cycles > 1) {
-            //if we have a cycle left, then we do a work/break cycle. else, we only do a work cycle.
-            if (onBreak) {
-              _startWorkSession(mainVars['Work Time'], cycles - 1);
-              onBreak = false;
-              tempDidWeFinish = "currently at work";
-            } else {
-              _startBreak(mainVars['Break Time'], cycles);
-              setPaused = false;
-              onBreak = true;
-              tempDidWeFinish = "currently on a break";
-            }
-          } else {
-            tempDidWeFinish = "finished a whole set!";
-            //completion event. if no more cycles, and we finish.
-            //this can only happen during a _startBreak session which doesn't make much sense.
-            //why force yourself to sit through the break?
-          }
-        }
-      });
-    });
-    print('ENDED _startTimer()');
-  } //Seems that the timer we WANT is timer.periodic,
-  //since we can update the visual value along with it.
-  // the original timer is just a one-of thing for events I think.
-
-  _startWorkSession(int time, int cycle) {
-    setState(() {
-      cyclesRemaining = cycle - 1;
-    });
-    _startTimer(time, cycle);
-
-    //add chime
-    player.play(AssetSource('audio/bing.mp3'));
-  }
-
-  _startBreak(int time, int cycle) {
-    player.play(AssetSource('audio/onBreak.mp3'));
-    _startTimer(time, cycle); //this doesn't seem right,...
-    //add *chime* I don't want to play a chime at the start, but when a cycle FINISHES...
-  }
-
-  _endPomodoro() {
-    //immediately ends the session (no more work, no more break)
-    setState(() {
-      mainTimerCount = 0;
-      forceEnd = true;
-    });
-  } //possibly unneeded
-
-  _pausePomodoro() {
-    //immediately jumps to the break for the cycle, extra remaining time is added to the break
-    setState(() {
-      setPaused = true;
-    });
-  }
-
   //WIDGET BUILD
-  breakOrAlterSession(onBreak) {
-    print('timer$timerExists');
-    if (!timerExists) {
-      return (ElevatedButton.icon(
-        onPressed: () {
-          _startPomodoro();
-        },
-        icon: const Icon(Icons.access_alarm),
-
-        //add padding here, and later remove the + button for a nav bar at the bottom
-        label: const Text("Begin Session"),
-      ));
-    } else {
-      return (Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          ElevatedButton.icon(
-            onPressed: () {
-              _endPomodoro();
-            },
-            icon: const Icon(Icons.stop_circle),
-            label: const Text("End Session Early"),
-          ),
-          (!onBreak)
-              ? (ElevatedButton.icon(
-                  onPressed: () {
-                    _pausePomodoro();
-                  },
-                  icon: const Icon(Icons.pause_circle_outline),
-                  label: const Text("Start Break Early"),
-                ))
-              : (ElevatedButton.icon(
-                  onPressed: () {
-                    print("object");
-                    setState(() {
-                      onBreak = false;
-                      _startPomodoro();
-                    });
-                  },
-                  icon: const Icon(Icons.pause_circle_outline),
-                  //TODO: ADD LOGIC SO WHEN WE RESTART AFTER THE BREAK WE DON'T LOSE OUR TIME.
-                  //the whole end break early logic doesn't work, I think.
-                  //if we start a break early, it just appends the time to the next timer. not next break, but even next set.
-                  label: const Text("End Break Early"),
-                )),
-        ],
-      ));
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
-    int minutes = (mainTimerCount / 60).floor();
-    int seconds = mainTimerCount % 60;
-    int currentIndex = 1;
-    Widget beginOrAlterSession = breakOrAlterSession(onBreak);
 
+    int currentIndex = 1;
     return Scaffold(
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
@@ -429,7 +275,7 @@ class MyHomePageState extends State<MyHomePage> {
             .primaryContainer, //not updating color properly?? idk why.
         selectedIndex: currentIndex,
         destinations: const [
-         NavigationDestination(
+          NavigationDestination(
               icon: Icon(Icons.calendar_month), label: "Schedule"),
           NavigationDestination(icon: Icon(Icons.timelapse), label: "Home"),
           NavigationDestination(icon: Icon(Icons.settings), label: "Settings"),
@@ -437,17 +283,17 @@ class MyHomePageState extends State<MyHomePage> {
         onDestinationSelected: (int index) {
           setState(() {
             currentIndex = index;
-            print('index:$currentIndex');
+            print('index:AAAA$currentIndex');
             //this WORKS but it's not what we want to have happen
+            //does it??? yes, but we aren't updating the currentindex onclick for some reason...
           });
         },
       ),
       body: <Widget>[
-
         MyCalendarPage(),
         MyMainPage(),
         MySettingsPage(),
-      ][currentIndex],
-      );
+      ][currentIndex],//can I not just pop whatever I want?
+    );
   }
 }

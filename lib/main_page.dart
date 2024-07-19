@@ -171,7 +171,7 @@ class MyMainPageState extends State<MyMainPage> {
 
   //WIDGET BUILD
   breakOrAlterSession(onBreak) {
-    print('timer$timerExists');
+    print('timer: $timerExists');
     if (!timerExists) {
       return (ElevatedButton.icon(
         onPressed: () {
@@ -256,7 +256,7 @@ class MyMainPageState extends State<MyMainPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Padding(
-                  padding: const EdgeInsets.all(50.0),
+                  padding: const EdgeInsets.all(20.0),
                   child: Text(
                     tempDidWeFinish,
                   ),
@@ -276,7 +276,17 @@ class MyMainPageState extends State<MyMainPage> {
                 ),
                 const Padding(padding: EdgeInsets.fromLTRB(0, 0, 0, 20.0)),
                 beginOrAlterSession,
-                const Padding(padding: EdgeInsets.all(30)),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ElevatedButton.icon(
+                    //we should find a way to add a 5 minute break specifically for this.
+                    onPressed:(){
+                      _startTimer(1200,3);
+                    }, 
+                    icon: const Icon(Icons.punch_clock), 
+                    label: Text("Quick Hour")
+                  ),
+                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
