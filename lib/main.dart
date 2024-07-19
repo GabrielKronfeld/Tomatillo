@@ -38,17 +38,20 @@
 //DONE hide semicircle when calendar isn't running
 
 //DONE add way to delete calendar event
-//DONEreplace form CupertinoButton with TimePicker
+//DONE replace form CupertinoButton with TimePicker
+
+//DONE classic pomodoro button
+//both below are done-ISH. step size increases by 5,10,or 60, but there's no minutes:seconds display, all in seconds. ah well. good enough for prod.
+//add a way to add minutes without needing to tap 60 times.
+//implement UNITS setting, //make units value work properly.
+
 
 //TODO:
 
     //high priority
-//classic pomodoro button
 //readjust the calendar, currently everything is shifted by an hour. NOT GOOD!!
 //make calendar properly update when we update db, without needing to leave and return to widget.
 //update buttons in with switches in settings and NavigationBar for menu/returns. <----save for later, very important but I'm struggling
-//add a way to add minutes without needing to tap 60 times.
-//implement UNITS setting, //make units value work properly.
 
     //low priority
 //make more elegant method to keep track of time. in what way? for the timer function? yeah.
@@ -180,7 +183,7 @@ class MyHomePageState extends State<MyHomePage> {
         0, //how many entries ever made for Calendar. Used for UID in db.
     'Overflow Time': true,
     'Invisible Timer': false,
-    'Units': 'seconds',
+    'Units': '5 seconds',
   };
 
 //next we want to put these into persistent memory

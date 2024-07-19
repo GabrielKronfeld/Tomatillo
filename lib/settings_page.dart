@@ -158,7 +158,7 @@ class SettingsModifierWidgetState extends State<SettingsModifierWidget> {
               value: MyHomePageState.mainVars[mainVarsKey],
               onChanged: (bool newval) {
                 setState(() {
-                  //this could probably be replaced with simpler 
+                  //this could probably be replaced with simpler
                   _swapLogicData(mainVarsKey);
                 });
               }),
@@ -232,7 +232,16 @@ class SettingsModifierWidgetState extends State<SettingsModifierWidget> {
       if (MyHomePageState.mainVars[dataName] is int) {
         print(prefs.getInt(dataName));
         if (dataName != 'Total Cycles') {
-          step = 5;
+          //change step depending on the value of Units
+          if (MyHomePageState.mainVars['Units'] == '5 seconds') {
+            step = 5;
+          }
+          if (MyHomePageState.mainVars['Units'] == '10 seconds') {
+            step = 10;
+          }
+          if (MyHomePageState.mainVars['Units'] == 'minutes') {
+            step = 60;
+          }
         }
         int data = (prefs.getInt(dataName) ?? 0) +
             step; //from shared preferences, this adds 1 to the int with key dataName.
@@ -253,11 +262,22 @@ class SettingsModifierWidgetState extends State<SettingsModifierWidget> {
           MyHomePageState.mainVars[dataName] > 1) {
         if (dataName != 'Total Cycles' &&
             MyHomePageState.mainVars[dataName] > 5) {
-          step = 5;
+          if (MyHomePageState.mainVars['Units'] == '5 seconds') {
+            step = 5;
+          }
+          if (MyHomePageState.mainVars['Units'] == '10 seconds') {
+            step = 10;
+          }
+          if (MyHomePageState.mainVars['Units'] == 'minutes') {
+            step = 60;
+          }
         }
         //make this a separate function so we can reuse the code elsewhere
         int data = (prefs.getInt(dataName) ?? 0) -
             step; //from shared preferences, this subtracts 1 to the int with key dataName.
+            if (data<0){
+              data=0;
+            } //why did I not do this before???? so eeeasy!!
         prefs.setInt(dataName,
             data); //this then updates the int with key dataName with the new int. basically a 2 line --.
         MyHomePageState.mainVars[dataName] = prefs
@@ -288,7 +308,7 @@ class SettingsModifierWidgetState extends State<SettingsModifierWidget> {
     setState(() {
       //so we can't go below 1 second or 1 break.
       if (MyHomePageState.mainVars[dataName] is String) {
-        List units = <String>['seconds', '10 seconds', 'minutes'];
+        List units = <String>['5 seconds', '10 seconds', 'minutes'];
         print(units);
         for (int i = 0; i < units.length; i++) {
           if (units[i] == MyHomePageState.mainVars[dataName]) {
@@ -296,7 +316,7 @@ class SettingsModifierWidgetState extends State<SettingsModifierWidget> {
           }
         }
         if (data == '') {
-          data = 'seconds';
+          data = '5 seconds';
         }
         prefs.setString(dataName, data);
         MyHomePageState.mainVars[dataName] = prefs.getString(dataName);
@@ -311,14 +331,14 @@ class SettingsModifierWidgetState extends State<SettingsModifierWidget> {
     setState(() {
       //so we can't go below 1 second or 1 break.
       if (MyHomePageState.mainVars[dataName] is String) {
-        List units = <String>['seconds', '10 seconds', 'minutes'];
+        List units = <String>['5 seconds', '10 seconds', 'minutes'];
         for (int i = 0; i < units.length; i++) {
           if (units[i] == MyHomePageState.mainVars[dataName]) {
             data = units[(i - 1) % units.length];
           }
         }
         if (data == '') {
-          data = 'seconds';
+          data = '5 seconds';
         }
         prefs.setString(dataName, data);
         MyHomePageState.mainVars[dataName] = prefs.getString(dataName);
