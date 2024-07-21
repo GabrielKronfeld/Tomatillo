@@ -51,11 +51,16 @@ class _ModifyEventFormState extends State<ModifyEventForm> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            Text('Add new event to calendar event $myid',
-                style: const TextStyle(fontWeight: FontWeight.bold)),
-            Text(mytitle,
-                style: const TextStyle(fontWeight: FontWeight.normal)),
             Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  mytitle,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+            Wrap(
               children: [
                 ElevatedButton(
                   onPressed: () async {
@@ -92,6 +97,12 @@ class _ModifyEventFormState extends State<ModifyEventForm> {
                   },
                   child: const Text("Delete task: hold button"),
                 ),
+                ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.of(context).popAndPushNamed('/main');
+                    },
+                    icon: Icon(Icons.punch_clock_rounded),
+                    label: Text('Pomodoro for this event')),
               ],
             ),
           ],

@@ -63,6 +63,7 @@ class _EventFormState extends State<EventForm> {
   @override
   Widget build(BuildContext context) {
     print('duration ${startTime}');
+    print(DateTime.now().weekday);
     return Form(
       //Title, Day, Time (when to when), Color
       key: _formKey,
@@ -79,8 +80,10 @@ class _EventFormState extends State<EventForm> {
             )),
             Padding(
               padding: const EdgeInsets.all(8),
+              
               child: DropdownMenu<String>(
-                initialSelection: days[DateTime.now().weekday],
+                //DateTime/now().weekday outputs 1-7, I want 0-6, so we shift the value
+                initialSelection: days[DateTime.now().weekday%7],
                 //we use the map function to iterate over the days list, and for each value
                 //(we call the iterated value "day", we assign it to value and label in
                 //a new DropdownMenuEntry object, and then push that object to a new list)

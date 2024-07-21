@@ -180,7 +180,7 @@ class MyMainPageState extends State<MyMainPage> {
         icon: const Icon(Icons.access_alarm),
 
         //add padding here, and later remove the + button for a nav bar at the bottom
-        label: const Text("Begin Session"),
+        label: const Text("Begin Custom Session"),
       ));
     } else {
       return (Row(

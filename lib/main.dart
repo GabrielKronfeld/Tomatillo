@@ -139,6 +139,10 @@ class MyApp extends StatelessWidget {
               ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 25, 68, 26)),
         ),
         home: const MyHomePage(title: 'Tomatillo\n🐸🍅🐸🍅🐸🍅🐸'),
+        initialRoute: '/main',
+        routes: {
+          '/main':(context) => MyHomePage(title: 'Tomatillo')
+        },
       ),
       // Your initialization for material app.
     );
