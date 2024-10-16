@@ -1,4 +1,3 @@
-
 import 'dart:async';
 import 'dart:io';
 import 'dart:core';
@@ -29,10 +28,8 @@ import 'main.dart';
       this.widthTask})
  */
 
-
 class MyMainPage extends StatefulWidget {
   const MyMainPage({super.key});
-
   @override
   State<MyMainPage> createState() => MyMainPageState();
 }
@@ -40,7 +37,6 @@ class MyMainPage extends StatefulWidget {
 //I guess we'll find out if the session is paused, interupted, or continues as normal while in a different widget.
 
 class MyMainPageState extends State<MyMainPage> {
-
   //logic vars
   int mainTimerCount = 0; //main timer count for pomodoro timer
   int totalTimeForCycleinSeconds = 0;
@@ -48,10 +44,17 @@ class MyMainPageState extends State<MyMainPage> {
   int timeRemaining = 0; //overflow time when jump to pause/break time.
   bool onBreak = false; //are we on a break or on a work session?
   bool setPaused = false;
+  bool endingBreak=false;
   bool timerExists = false; //does a timer currently exist/are we on a cycle?
 //we can probably replace this with if mainVars['Total Cycles']>1? no. if we pause the timer then we need to
 //save time remaining, kill timer, run remaining time on a single timer, then run regular timer again, right?
 //maybe we go for that a little later.
+
+  Map mytable = {
+    'runinstantTimer': false,
+    'timetorun': 0,
+    'cycles': 0,
+  };
   bool forceEnd = false;
   //testing vars
   String tempDidWeFinish =
@@ -62,23 +65,36 @@ class MyMainPageState extends State<MyMainPage> {
 
   final player = AudioPlayer();
 
+  @override
+  void initState() {
+    print('in init!');
+    print(mytable);
+    //this never hits since we don't reload the state, and it's false on init.
+    if (mytable['runinstantTimer'] == true) {
+      mytable['runinstantTimer'] == false;
+      startTimer(mytable['timetorun'], mytable['cycles']);
+    }
+  }
+
   //what we do on start. Just so we can add things to the start of the work session if need be.
   //TIMER EXISTS WHEN WE WANT TO END THE BREAK EARLY! WORK SESSSION DOES NOT GO!
-  _startPomodoro() {
+  _startPomodoro(int? timetorun, int? cycles) {
     if (!timerExists) {
       tempDidWeFinish = 'onPomodoro!';
-      _startWorkSession(MyHomePageState.mainVars['Work Time'], MyHomePageState.mainVars['Total Cycles']);
+      _startWorkSession(timetorun ?? MyHomePageState.mainVars['Work Time'],
+          cycles ?? MyHomePageState.mainVars['Total Cycles']);
     }
   }
 
   //using recursion to sort this shit out. garbage code. very bad. D--
-  _startTimer(timeToRun, cycles) {
+  startTimer(timeToRun, cycles) {
     //once every second, decrease the time by a second (duh)
     setState(() {
       timerExists = true;
     });
-    mainTimerCount =
-        timeToRun + (MyHomePageState.mainVars['Overflow Time'] ? timeRemaining : 0);
+    print('AWOOOOOOOOOOOOOOOOOOGA');
+    mainTimerCount = timeToRun +
+        (MyHomePageState.mainVars['Overflow Time'] ? timeRemaining : 0);
     totalTimeForCycleinSeconds = mainTimerCount;
     timeRemaining = 0;
     Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -87,6 +103,10 @@ class MyMainPageState extends State<MyMainPage> {
         if (!(mainTimerCount < 1 || setPaused)) {
           //if we don't have an end condition, tick a second.
           mainTimerCount--;
+          if (endingBreak==true){
+            endingBreak=false;
+            mainTimerCount=0;
+          }
         } else {
           //all end conditions/swap state logic
           if (setPaused) {
@@ -115,7 +135,8 @@ class MyMainPageState extends State<MyMainPage> {
           } else if (cycles > 1) {
             //if we have a cycle left, then we do a work/break cycle. else, we only do a work cycle.
             if (onBreak) {
-              _startWorkSession(MyHomePageState.mainVars['Work Time'], cycles - 1);
+              _startWorkSession(
+                  MyHomePageState.mainVars['Work Time'], cycles - 1);
               onBreak = false;
               tempDidWeFinish = "currently at work";
             } else {
@@ -142,7 +163,7 @@ class MyMainPageState extends State<MyMainPage> {
     setState(() {
       cyclesRemaining = cycle - 1;
     });
-    _startTimer(time, cycle);
+    startTimer(time, cycle);
 
     //add chime
     player.play(AssetSource('audio/bing.mp3'));
@@ -150,7 +171,7 @@ class MyMainPageState extends State<MyMainPage> {
 
   _startBreak(int time, int cycle) {
     player.play(AssetSource('audio/onBreak.mp3'));
-    _startTimer(time, cycle); //this doesn't seem right,...
+    startTimer(time, cycle); //this doesn't seem right,...
     //add *chime* I don't want to play a chime at the start, but when a cycle FINISHES...
   }
 
@@ -173,15 +194,43 @@ class MyMainPageState extends State<MyMainPage> {
   breakOrAlterSession(onBreak) {
     print('timer: $timerExists');
     if (!timerExists) {
-      return (ElevatedButton.icon(
-        onPressed: () {
-          _startPomodoro();
-        },
-        icon: const Icon(Icons.access_alarm),
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          (ElevatedButton.icon(
+            onPressed: () {
+              _startPomodoro(null, null);
+            },
+            icon: const Icon(Icons.access_alarm),
 
-        //add padding here, and later remove the + button for a nav bar at the bottom
-        label: const Text("Begin Custom Session"),
-      ));
+            //add padding here, and later remove the + button for a nav bar at the bottom
+            label: const Text("Begin Custom Session"),
+          )),
+          Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: ElevatedButton.icon(
+                  //we should find a way to add a 5 minute break specifically for this.
+                  onPressed: () {
+                    setState(() {
+                      print(mytable);
+                       if (mytable['runinstantTimer']) {
+                      mytable['runinstantTimer'] == false;
+                      startTimer(mytable['timetorun'], mytable['cycles']);
+                    } else {
+                      _startPomodoro(1200, 3);
+                    }
+                    });
+                   
+                  },
+                  icon: const Icon(Icons.punch_clock),
+                  label: (!mytable['runinstantTimer'])
+                      ? Text("Quick Hour")
+                      : Text("Quick Event"),
+                ),
+              ),
+        ],
+        
+      );
     } else {
       return (Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -193,6 +242,7 @@ class MyMainPageState extends State<MyMainPage> {
             icon: const Icon(Icons.stop_circle),
             label: const Text("End Session Early"),
           ),
+          Padding(padding: EdgeInsets.all(8.0)),
           (!onBreak)
               ? (ElevatedButton.icon(
                   onPressed: () {
@@ -206,7 +256,9 @@ class MyMainPageState extends State<MyMainPage> {
                     print("object");
                     setState(() {
                       onBreak = false;
-                      _startPomodoro();
+                      endingBreak=true;
+
+
                     });
                   },
                   icon: const Icon(Icons.pause_circle_outline),
@@ -232,111 +284,105 @@ class MyMainPageState extends State<MyMainPage> {
     Widget beginOrAlterSession = breakOrAlterSession(onBreak);
 
     return Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: SizedBox.expand(
-          child: Container(
-            color: Theme.of(context).colorScheme.primaryContainer,
-            child: Column(
-              // Column is also a layout widget. It takes a list of children and
-              // arranges them vertically. By default, it sizes itself to fit its
-              // children horizontally, and tries to be as tall as its parent.
-              //
-              // Invoke "debug painting" (press "p" in the console, choose the
-              // "Toggle Debug Paint" action from the Flutter Inspector in Android
-              // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-              // to see the wireframe for each widget.
-              //
-              // Column has various properties to control how it sizes itself and
-              // how it positions its children. Here we use mainAxisAlignment to
-              // center the children vertically; the main axis here is the vertical
-              // axis because Columns are vertical (the cross axis would be
-              // horizontal).
+      // Center is a layout widget. It takes a single child and positions it
+      // in the middle of the parent.
+      child: SizedBox.expand(
+        child: Container(
+          color: Theme.of(context).colorScheme.primaryContainer,
+          child: Column(
+            // Column is also a layout widget. It takes a list of children and
+            // arranges them vertically. By default, it sizes itself to fit its
+            // children horizontally, and tries to be as tall as its parent.
+            //
+            // Invoke "debug painting" (press "p" in the console, choose the
+            // "Toggle Debug Paint" action from the Flutter Inspector in Android
+            // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
+            // to see the wireframe for each widget.
+            //
+            // Column has various properties to control how it sizes itself and
+            // how it positions its children. Here we use mainAxisAlignment to
+            // center the children vertically; the main axis here is the vertical
+            // axis because Columns are vertical (the cross axis would be
+            // horizontal).
 
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Text(
-                    tempDidWeFinish,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Text(
+                  tempDidWeFinish,
+                ),
+              ),
+              //hiding TimerIndicator when not in use
+              timerExists
+                  ? TimerIndicator(
+                      totalTimeinSeconds: totalTimeForCycleinSeconds,
+                      minutes: minutes,
+                      seconds: seconds,
+                    )
+                  : Container(width: 50, height: 50),
+              Padding(padding: EdgeInsetsDirectional.symmetric()),
+              Text(
+                'breaks remaining: $cyclesRemaining',
+                style: Theme.of(context).textTheme.labelSmall,
+              ),
+              const Padding(padding: EdgeInsets.fromLTRB(0, 0, 0, 20.0)),
+              beginOrAlterSession,
+              
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // row of buttons for the main page
+
+                  ElevatedButton.icon(
+                    //this brings us to the calendar page
+                    onPressed: () {
+                      //navigate to Calendar Page
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => MyCalendarPage()));
+                              dispose();
+                    },
+                    icon: const Icon(Icons.calendar_month),
+
+                    //add padding here, and later remove the + button for a nav bar at the bottom
+                    label: const Text("Calendar"),
                   ),
-                ),
-                //hiding TimerIndicator when not in use
-                timerExists
-                    ? TimerIndicator(
-                        totalTimeinSeconds: totalTimeForCycleinSeconds,
-                        minutes: minutes,
-                        seconds: seconds,
-                      )
-                    : Container(width: 50, height: 50),
-                Padding(padding: EdgeInsetsDirectional.symmetric()),
-                Text(
-                  'breaks remaining: $cyclesRemaining',
-                  style: Theme.of(context).textTheme.labelSmall,
-                ),
-                const Padding(padding: EdgeInsets.fromLTRB(0, 0, 0, 20.0)),
-                beginOrAlterSession,
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: ElevatedButton.icon(
-                    //we should find a way to add a 5 minute break specifically for this.
-                    onPressed:(){
-                      _startTimer(1200,3);
-                    }, 
-                    icon: const Icon(Icons.punch_clock), 
-                    label: Text("Quick Hour")
+                  const Padding(padding: EdgeInsets.all(8)),
+/*
+                  ElevatedButton.icon(
+                    //this brings us to the calendar page
+                    onPressed: () {
+                      //navigate to Calendar Page
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const MyCalendarPage2()));
+                    },
+                    icon: const Icon(Icons.calendar_today),
+
+                    //add padding here, and later remove the + button for a nav bar at the bottom
+                    label: const Text("Calendar"),
                   ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // row of buttons for the main page
-                    ElevatedButton.icon(
-                      //this brings us to the calendar page
-                      onPressed: () {
-                        //navigate to Calendar Page
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => MyCalendarPage()));
-                      },
-                      icon: const Icon(Icons.calendar_month),
+                
+                */
+                 const Padding(padding: EdgeInsets.all(8)),
 
-                      //add padding here, and later remove the + button for a nav bar at the bottom
-                      label: const Text("Calendar"),
-                    ),
-                    const Padding(padding: EdgeInsets.all(8)),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      //navigate to Setting Page
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const MySettingsPage()));
+                    },
+                    icon: const Icon(Icons.settings),
 
-                    ElevatedButton.icon(
-                      //this brings us to the calendar page
-                      onPressed: () {
-                        //navigate to Calendar Page
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const MyCalendarPage2()));
-                      },
-                      icon: const Icon(Icons.calendar_today),
-
-                      //add padding here, and later remove the + button for a nav bar at the bottom
-                      label: const Text("Calendar"),
-                    ),
-                    const Padding(padding: EdgeInsets.all(8)),
-
-                    ElevatedButton.icon(
-                      onPressed: () {
-                        //navigate to Setting Page
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const MySettingsPage()));
-                      },
-                      icon: const Icon(Icons.settings),
-
-                      //add padding here, and later remove the + button for a nav bar at the bottom
-                      label: const Text("Settings"),
-                    ),
-                    /*ElevatedButton.icon(
+                    //add padding here, and later remove the + button for a nav bar at the bottom
+                    label: const Text("Settings"),
+                  ),
+                  /*ElevatedButton.icon(
                       onPressed: () {
                         //navigate to Setting Page
                         Navigator.push(
@@ -349,12 +395,12 @@ class MyMainPageState extends State<MyMainPage> {
                       //add padding here, and later remove the + button for a nav bar at the bottom
                       label: const Text("color"),
                     ),*/
-                  ],
-                ),
-              ],
-            ),
+                ],
+              ),
+            ],
           ),
         ),
-     );
+      ),
+    );
   }
 }
