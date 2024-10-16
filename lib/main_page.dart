@@ -348,7 +348,6 @@ class MyMainPageState extends State<MyMainPage> {
                           context,
                           MaterialPageRoute(
                               builder: (context) => MyCalendarPage()));
-                              dispose();
                     },
                     icon: const Icon(Icons.calendar_month),
 
