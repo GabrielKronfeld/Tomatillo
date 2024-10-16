@@ -197,18 +197,21 @@ class MyMainPageState extends State<MyMainPage> {
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
           ElevatedButton.icon(
-            onPressed: () {
-              _startPomodoro(null, null);
-            },
-            icon: const Icon(Icons.access_alarm),
+                onPressed: () {
+                  _startPomodoro(null, nullnull, null);
+                },
+                icon: const Icon(Icons.access_alarm),
 
             //add padding here, and later remove the + button for a nav bar at the bottom
             label: const Text("Begin Custom Session"),
-          ),
-          Padding(padding: EdgeInsets.all(8.0)),
-          
-                ElevatedButton.icon(
+          )),
+          Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: ElevatedButton.icon(
                   //we should find a way to add a 5 minute break specifically for this.
                   onPressed: () {
                     setState(() {
@@ -227,54 +230,48 @@ class MyMainPageState extends State<MyMainPage> {
                       ? Text("Quick Hour")
                       : Text("Quick Event"),
                 ),
-              Padding(padding: EdgeInsets.all(8.0))
+              ),
         ],
         
       );
     } else {
-      return Column(
+      return (Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          (Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton.icon(
-                onPressed: () {
-                  _endPomodoro();
-                },
-                icon: const Icon(Icons.stop_circle),
-                label: const Text("End Session Early"),
-              ),
-              Padding(padding: EdgeInsets.all(8.0)),
-              (!onBreak)
-                  ? (ElevatedButton.icon(
-                      onPressed: () {
-                        _pausePomodoro();
-                      },
-                      
-                      icon: const Icon(Icons.pause_circle_outline),
-                      label: const Text("Start Break Early"),
-                    ))
-                  : (ElevatedButton.icon(
-                      onPressed: () {
-                        print("object");
-                        setState(() {
-                          onBreak = false;
-                          endingBreak=true;
+          ElevatedButton.icon(
+            onPressed: () {
+              _endPomodoro();
+            },
+            icon: const Icon(Icons.stop_circle),
+            label: const Text("End Session Early"),
+          ),
+          Padding(padding: EdgeInsets.all(8.0)),
+          (!onBreak)
+              ? (ElevatedButton.icon(
+                  onPressed: () {
+                    _pausePomodoro();
+                  },
+                  icon: const Icon(Icons.pause_circle_outline),
+                  label: const Text("Start Break Early"),
+                ))
+              : (ElevatedButton.icon(
+                  onPressed: () {
+                    print("object");
+                    setState(() {
+                      onBreak = false;
+                      endingBreak=true;
 
 
-                        });
-                      },
-                      icon: const Icon(Icons.pause_circle_outline),
-                      //TODO: ADD LOGIC SO WHEN WE RESTART AFTER THE BREAK WE DON'T LOSE OUR TIME.
-                      //the whole end break early logic doesn't work, I think.
-                      //if we start a break early, it just appends the time to the next timer. not next break, but even next set.
-                      label: const Text("End Break Early"),
-                    )),
-            ],
-          )),
-          Padding(padding: EdgeInsets.all(8.0))
+                    });
+                  },
+                  icon: const Icon(Icons.pause_circle_outline),
+                  //TODO: ADD LOGIC SO WHEN WE RESTART AFTER THE BREAK WE DON'T LOSE OUR TIME.
+                  //the whole end break early logic doesn't work, I think.
+                  //if we start a break early, it just appends the time to the next timer. not next break, but even next set.
+                  label: const Text("End Break Early"),
+                )),
         ],
-      );
+      ));
     }
   }
 
@@ -334,7 +331,7 @@ class MyMainPageState extends State<MyMainPage> {
               ),
               const Padding(padding: EdgeInsets.fromLTRB(0, 0, 0, 20.0)),
               beginOrAlterSession,
-
+              
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -348,6 +345,7 @@ class MyMainPageState extends State<MyMainPage> {
                           context,
                           MaterialPageRoute(
                               builder: (context) => MyCalendarPage()));
+                              dispose();
                     },
                     icon: const Icon(Icons.calendar_month),
 
