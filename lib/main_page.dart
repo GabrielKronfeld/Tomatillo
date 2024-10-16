@@ -1,19 +1,21 @@
 import 'dart:async';
-import 'dart:io';
 import 'dart:core';
 import 'package:flutter/material.dart';
 import 'settings_page.dart';
 import 'calendar_page.dart';
-import 'calendar_page2.dart';
 import 'timer_indicator.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 //MAKE SURE ALL AUDIO IS IN FLUTTER ASSETS IN THE PUBSPEC.YAML
 import 'package:audioplayers/audioplayers.dart';
+/*
+import 'dart:io';
+import 'calendar_page2.dart';
 import 'package:calendar_view/calendar_view.dart';
 import 'timer_logic.dart';
 import 'all_theme_colors.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+*/
 import 'main.dart';
 
 /**
@@ -44,7 +46,7 @@ class MyMainPageState extends State<MyMainPage> {
   int timeRemaining = 0; //overflow time when jump to pause/break time.
   bool onBreak = false; //are we on a break or on a work session?
   bool setPaused = false;
-  bool endingBreak=false;
+  bool endingBreak = false;
   bool timerExists = false; //does a timer currently exist/are we on a cycle?
 //we can probably replace this with if mainVars['Total Cycles']>1? no. if we pause the timer then we need to
 //save time remaining, kill timer, run remaining time on a single timer, then run regular timer again, right?
@@ -67,6 +69,7 @@ class MyMainPageState extends State<MyMainPage> {
 
   @override
   void initState() {
+    super.initState();
     print('in init!');
     print(mytable);
     //this never hits since we don't reload the state, and it's false on init.
@@ -103,9 +106,9 @@ class MyMainPageState extends State<MyMainPage> {
         if (!(mainTimerCount < 1 || setPaused)) {
           //if we don't have an end condition, tick a second.
           mainTimerCount--;
-          if (endingBreak==true){
-            endingBreak=false;
-            mainTimerCount=0;
+          if (endingBreak == true) {
+            endingBreak = false;
+            mainTimerCount = 0;
           }
         } else {
           //all end conditions/swap state logic
@@ -194,84 +197,79 @@ class MyMainPageState extends State<MyMainPage> {
   breakOrAlterSession(onBreak) {
     print('timer: $timerExists');
     if (!timerExists) {
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          ElevatedButton.icon(
-                onPressed: () {
-                  _startPomodoro(null, nullnull, null);
-                },
-                icon: const Icon(Icons.access_alarm),
+      return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+        ElevatedButton.icon(
+          onPressed: () {
+            _startPomodoro(null, null);
+          },
+          icon: const Icon(Icons.access_alarm),
 
-            //add padding here, and later remove the + button for a nav bar at the bottom
-            label: const Text("Begin Custom Session"),
-          )),
-          Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: ElevatedButton.icon(
-                  //we should find a way to add a 5 minute break specifically for this.
-                  onPressed: () {
-                    setState(() {
-                      print(mytable);
-                       if (mytable['runinstantTimer']) {
-                      mytable['runinstantTimer'] == false;
-                      startTimer(mytable['timetorun'], mytable['cycles']);
-                    } else {
-                      _startPomodoro(1200, 3);
-                    }
-                    });
-                   
-                  },
-                  icon: const Icon(Icons.punch_clock),
-                  label: (!mytable['runinstantTimer'])
-                      ? Text("Quick Hour")
-                      : Text("Quick Event"),
-                ),
-              ),
-        ],
-        
-      );
-    } else {
-      return (Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          ElevatedButton.icon(
+          //add padding here, and later remove the + button for a nav bar at the bottom
+          label: const Text("Begin Custom Session"),
+        ),
+
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: ElevatedButton.icon(
+            //we should find a way to add a 5 minute break specifically for this.
             onPressed: () {
-              _endPomodoro();
+              setState(() {
+                print(mytable);
+                if (mytable['runinstantTimer']) {
+                  mytable['runinstantTimer'] == false;
+                  startTimer(mytable['timetorun'], mytable['cycles']);
+                } else {
+                  _startPomodoro(1200, 3);
+                }
+              });
             },
-            icon: const Icon(Icons.stop_circle),
-            label: const Text("End Session Early"),
+            icon: const Icon(Icons.punch_clock),
+            label: (!mytable['runinstantTimer'])
+                ? Text("Quick Hour")
+                : Text("Quick Event"),
           ),
-          Padding(padding: EdgeInsets.all(8.0)),
-          (!onBreak)
-              ? (ElevatedButton.icon(
-                  onPressed: () {
-                    _pausePomodoro();
-                  },
-                  icon: const Icon(Icons.pause_circle_outline),
-                  label: const Text("Start Break Early"),
-                ))
-              : (ElevatedButton.icon(
-                  onPressed: () {
-                    print("object");
-                    setState(() {
-                      onBreak = false;
-                      endingBreak=true;
-
-
-                    });
-                  },
-                  icon: const Icon(Icons.pause_circle_outline),
-                  //TODO: ADD LOGIC SO WHEN WE RESTART AFTER THE BREAK WE DON'T LOSE OUR TIME.
-                  //the whole end break early logic doesn't work, I think.
-                  //if we start a break early, it just appends the time to the next timer. not next break, but even next set.
-                  label: const Text("End Break Early"),
-                )),
-        ],
-      ));
+        ),
+                
+      ]);
+    } else {
+      return Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: (Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton.icon(
+              onPressed: () {
+                _endPomodoro();
+              },
+              icon: const Icon(Icons.stop_circle),
+              label: const Text("End Session Early"),
+            ),
+            Padding(padding: EdgeInsets.all(8.0)),
+            (!onBreak)
+                ? (ElevatedButton.icon(
+                    onPressed: () {
+                      _pausePomodoro();
+                    },
+                    icon: const Icon(Icons.pause_circle_outline),
+                    label: const Text("Start Break Early"),
+                  ))
+                : (ElevatedButton.icon(
+                    onPressed: () {
+                      print("object");
+                      setState(() {
+                        onBreak = false;
+                        endingBreak = true;
+                      });
+                    },
+                    icon: const Icon(Icons.pause_circle_outline),
+                    //TODO: ADD LOGIC SO WHEN WE RESTART AFTER THE BREAK WE DON'T LOSE OUR TIME.
+                    //the whole end break early logic doesn't work, I think.
+                    //if we start a break early, it just appends the time to the next timer. not next break, but even next set.
+                    label: const Text("End Break Early"),
+                  )),
+          ],
+        )),
+      );
     }
   }
 
@@ -283,7 +281,7 @@ class MyMainPageState extends State<MyMainPage> {
     // than having to individually change instances of widgets.
     int minutes = (mainTimerCount / 60).floor();
     int seconds = mainTimerCount % 60;
-    int currentIndex = 1;
+    int currentIndex = 1;//isn't used..? we need to fix this algorithm.
     Widget beginOrAlterSession = breakOrAlterSession(onBreak);
 
     return Center(
@@ -331,7 +329,7 @@ class MyMainPageState extends State<MyMainPage> {
               ),
               const Padding(padding: EdgeInsets.fromLTRB(0, 0, 0, 20.0)),
               beginOrAlterSession,
-              
+
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -345,7 +343,7 @@ class MyMainPageState extends State<MyMainPage> {
                           context,
                           MaterialPageRoute(
                               builder: (context) => MyCalendarPage()));
-                              dispose();
+                      dispose();
                     },
                     icon: const Icon(Icons.calendar_month),
 
@@ -370,7 +368,7 @@ class MyMainPageState extends State<MyMainPage> {
                   ),
                 
                 */
-                 const Padding(padding: EdgeInsets.all(8)),
+                  const Padding(padding: EdgeInsets.all(8)),
 
                   ElevatedButton.icon(
                     onPressed: () {

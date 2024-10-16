@@ -1,8 +1,8 @@
 import 'package:calendar_view/calendar_view.dart';
-
-import 'main.dart';
 import 'package:flutter/material.dart';
 import 'package:time_planner/time_planner.dart';
+
+//presently deprecated, used for testing sometimes.
 
 class MyCalendarPage2 extends StatefulWidget {
   const MyCalendarPage2({super.key});
@@ -19,7 +19,6 @@ class MyCalendarPageState extends State<MyCalendarPage2> {
 
   @override
   Widget build(BuildContext context) {
-
 
     List<TimePlannerTask> tasks = [
     TimePlannerTask(

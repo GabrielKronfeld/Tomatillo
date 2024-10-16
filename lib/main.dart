@@ -68,23 +68,13 @@
 //widget-icon overlay thing from the top for notifications.
 //add a random color to each event, giving it a random HSV of any,0-30,100-75 from HSVColor class
 //add proper dings, not my voice.
-import 'dart:async';
-import 'dart:io';
 import 'dart:core';
 import 'package:flutter/material.dart';
 import 'package:tomatillo_flutter/main_page.dart';
 import 'settings_page.dart';
 import 'calendar_page.dart';
-import 'calendar_page2.dart';
-import 'timer_indicator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-//MAKE SURE ALL AUDIO IS IN FLUTTER ASSETS IN THE PUBSPEC.YAML
-import 'package:audioplayers/audioplayers.dart';
 import 'package:calendar_view/calendar_view.dart';
-import 'timer_logic.dart';
-import 'all_theme_colors.dart';
-import 'package:sqflite/sqflite.dart';
-import 'package:path/path.dart';
 
 void main() async {
   //added all

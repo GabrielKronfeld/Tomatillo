@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'main.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 
+// ignore: must_be_immutable
 class TimerIndicator extends StatefulWidget {
   //DONE: call parent class to refresh so we can have the timer be invisible until the timer starts, so we get 
   //rid of that super weird looking 2/3 circle.

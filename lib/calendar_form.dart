@@ -1,6 +1,4 @@
 import 'dart:core';
-import 'dart:ffi';
-import 'package:calendar_view/calendar_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -9,9 +7,7 @@ import 'package:tomatillo_flutter/calendar_page.dart';
 import 'package:tomatillo_flutter/database.dart';
 import 'package:tomatillo_flutter/tptask.dart';
 import 'main.dart';
-import 'settings_page.dart';
 import 'package:flutter/widgets.dart';
-import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
 //When you save, post all the data to a sqlite db.
