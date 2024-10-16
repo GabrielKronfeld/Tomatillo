@@ -1,20 +1,9 @@
 import 'dart:core';
-import 'dart:ffi';
 import 'package:flutter/material.dart';
+import 'package:tomatillo_flutter/main_page.dart';
 import 'calendar_form.dart';
-import 'calendar_page.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:time_planner/time_planner.dart';
-import 'package:tomatillo_flutter/calendar_page.dart';
 import 'package:tomatillo_flutter/database.dart';
-import 'package:tomatillo_flutter/tptask.dart';
 import 'main.dart';
-import 'settings_page.dart';
-
-import 'package:flutter/widgets.dart';
-import 'package:path/path.dart';
-import 'package:sqflite/sqflite.dart';
 
 class ModifyEventForm extends StatefulWidget {
   final Function() notifyParent;
@@ -36,11 +25,20 @@ class _ModifyEventFormState extends State<ModifyEventForm> {
   void initState() {
     super.initState();
     database = openDB();
+    returnTPTask(database, myid)
+        .then((value) => timeToRun = value.minutesDuration*60)
+        .whenComplete(() => cycles =
+            (timeToRun ~/ // ~/ operator is: division, drop remainder
+                (MyHomePageState.mainVars['Work Time'] +
+                        MyHomePageState.mainVars['Break Time'])
+                    .toInt()));
   }
 
   var database;
   late var myid = widget.id;
   late var mytitle = widget.title;
+  late var timeToRun;
+  late var cycles;
 
   final _formKey = GlobalKey<FormState>();
   @override
@@ -97,12 +95,24 @@ class _ModifyEventFormState extends State<ModifyEventForm> {
                   },
                   child: const Text("Delete task: hold button"),
                 ),
+                //for now this doesn't work. we'll keep it off.
+                /*
                 ElevatedButton.icon(
-                    onPressed: () {
-                      Navigator.of(context).popAndPushNamed('/main');
+                    onPressed: ()  {
+                      //literally does not work as intended.
+                      setState(() {
+                      MyMainPageState().mytable['runinstantTimer']=true;
+                      MyMainPageState().mytable['timetorun']=timeToRun;
+                      MyMainPageState().mytable['cycles']=cycles;
+                      print(MyMainPageState().mytable);
+                      Navigator.of(context).popUntil(ModalRoute.withName('/'));
+                      print(MyMainPageState().mytable);
+                      });
+
                     },
                     icon: Icon(Icons.punch_clock_rounded),
-                    label: Text('Pomodoro for this event')),
+                    label: Text('Pomodoro for this event')
+                    ),*/
               ],
             ),
           ],

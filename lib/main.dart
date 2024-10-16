@@ -44,16 +44,23 @@
 //both below are done-ISH. step size increases by 5,10,or 60, but there's no minutes:seconds display, all in seconds. ah well. good enough for prod.
 //add a way to add minutes without needing to tap 60 times.
 //implement UNITS setting, //make units value work properly.
+//fixed off-by-one range issue in calendar_form for datetime.day  being 1-7mon-sun, I track 0-6sun-sat, solved with mod7.
 
 
 //TODO:
 
     //high priority
-//readjust the calendar, currently everything is shifted by an hour. NOT GOOD!!
-//make calendar properly update when we update db, without needing to leave and return to widget.
+//make the timer start when we choose the calendar 
 //update buttons in with switches in settings and NavigationBar for menu/returns. <----save for later, very important but I'm struggling
 
+
     //low priority
+
+
+//make calendar properly update when we update db, without needing to leave and return to widget.
+//standard pomodoro timing switch in settings, overrides (but greys out) the custom values.
+//make units adjustment better. it "works" but it's hot trash, and is confusing, and reads poorly with calendar
+//readjust the calendar, currently everything is shifted by an hour. NOT GOOD!!
 //make more elegant method to keep track of time. in what way? for the timer function? yeah.
 //fix start break early button
 //Add a dark mode!!
@@ -139,9 +146,9 @@ class MyApp extends StatelessWidget {
               ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 25, 68, 26)),
         ),
         home: const MyHomePage(title: 'Tomatillo\n🐸🍅🐸🍅🐸🍅🐸'),
-        initialRoute: '/main',
+        initialRoute: '/',// home is '/' for routes 
         routes: {
-          '/main':(context) => MyHomePage(title: 'Tomatillo')
+          '/main':(context) => MyMainPage(),
         },
       ),
       // Your initialization for material app.
@@ -158,7 +165,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+  const MyHomePage({super.key, required this.title,  this.runningTimer});
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -170,7 +177,7 @@ class MyHomePage extends StatefulWidget {
   // always marked "final".
 
   final String title;
-
+  final int? runningTimer;
   @override
   State<MyHomePage> createState() => MyHomePageState();
 }
@@ -245,13 +252,10 @@ class MyHomePageState extends State<MyHomePage> {
 //maybe we go for that a little later.
   bool forceEnd = false;
   //testing vars
-  String tempDidWeFinish =
-      ''; //acts as a way to display state so we have our prototype
+  String tempDidWeFinish =''; //acts as a way to display state so we have our prototype
   //before we start working on adding widget changes and building new components based on state.
   //I think we'll need to change the var names and structure a bit for clarity. onBreak vs setPaused vs timerExists are very similar and should be made
   //more DISTINCT.
-
-  final player = AudioPlayer();
 
   @override
   void initState() {
@@ -275,7 +279,7 @@ class MyHomePageState extends State<MyHomePage> {
         centerTitle: true,
         title: Text(widget.title),
         backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-      ),
+      ),/*
       bottomNavigationBar: NavigationBar(
         backgroundColor: Theme.of(context)
             .colorScheme
@@ -290,12 +294,13 @@ class MyHomePageState extends State<MyHomePage> {
         onDestinationSelected: (int index) {
           setState(() {
             currentIndex = index;
-            print('index:AAAA$currentIndex');
+            print('index: $currentIndex');
             //this WORKS but it's not what we want to have happen
             //does it??? yes, but we aren't updating the currentindex onclick for some reason...
           });
         },
       ),
+     */
       body: <Widget>[
         MyCalendarPage(),
         MyMainPage(),
