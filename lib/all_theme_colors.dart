@@ -1,9 +1,4 @@
-import 'package:flutter/src/widgets/placeholder.dart';
-
 import 'package:flutter/src/widgets/framework.dart';
-
-import 'main.dart';
-
 import 'package:flutter/material.dart';
 
 class MyWidget extends StatelessWidget {

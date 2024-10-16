@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'main.dart';
 import 'package:flutter/material.dart';
 import 'package:time_planner/time_planner.dart';
 import 'calendar_form.dart';
@@ -27,7 +26,7 @@ import 'calendar_modify_form.dart';
 class MyCalendarPage extends StatefulWidget {
   MyCalendarPage({super.key});
 
-  DateTime timeofDay = DateTime.now();
+  final DateTime timeofDay = DateTime.now();
   static String sampletext = "sampletext";
 
   @override
@@ -103,10 +102,9 @@ List<TimePlannerTask> getTasksList(tasks) {
       showScrollBar: true,
       cellHeight: 40,
       cellWidth: 90,
-      dividerColor: theme.background,
+      dividerColor: theme.surface,
       //horizontalTaskPadding: 8.0,
     );
-    var textforTask = 'this is a task';
     //update the list of tasks based on the database.
     List<TimePlannerTask> tasks = [
       //start with an empty task list
